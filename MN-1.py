@@ -9,6 +9,7 @@ import random
 import threading
 import numpy as np
 from pydub import AudioSegment
+from mutagen.flac import FLAC as FLAC_MUTAGEN # Import FLAC from mutagen
 
 # Define colors for the minimal theme
 COLOR_BLACK = "#000000"
@@ -341,8 +342,8 @@ class CyberpunkMusicPlayer:
         """Add songs to the playlist"""
         # Get song paths
         songs = filedialog.askopenfilenames(
-            title="Select MP3 Files",
-            filetypes=(("MP3 Files", "*.mp3"), ("All Files", "*.*"))
+            title="Select Audio Files", # Updated title
+            filetypes=(("Audio Files", "*.mp3 *.flac"), ("MP3 Files", "*.mp3"), ("FLAC Files", "*.flac"), ("All Files", "*.*")) # Added FLAC to filetypes
         )
 
         # Add songs to playlist
@@ -566,16 +567,32 @@ class CyberpunkMusicPlayer:
 
         # Get song length
         try:
-            audio = MP3(self.current_song)
-            self.song_length = audio.info.length
-            # Convert to time format
-            mins, secs = divmod(int(self.song_length), 60)
-            self.total_time = f"{mins:02d}:{secs:02d}"
-            self.total_time_label.configure(text=self.total_time)
+            file_extension = os.path.splitext(self.current_song)[1].lower()
+            if file_extension == '.mp3':
+                audio = MP3(self.current_song)
+            elif file_extension == '.flac':
+                audio = FLAC_MUTAGEN(self.current_song) # Use FLAC_MUTAGEN for FLAC files
+            else:
+                audio = None # Unknown format
 
-            # Set slider maximum
-            self.song_slider.configure(to=int(self.song_length))
-            self.song_slider.configure(to=self.song_length) # Set slider max to song length
+            if audio:
+                self.song_length = audio.info.length
+                # Convert to time format
+                mins, secs = divmod(int(self.song_length), 60)
+                self.total_time = f"{mins:02d}:{secs:02d}"
+                self.total_time_label.configure(text=self.total_time)
+
+                # Set slider maximum
+                self.song_slider.configure(to=int(self.song_length))
+                self.song_slider.configure(to=self.song_length) # Set slider max to song length
+            else:
+                print(f"Warning: Could not get song info for format: {file_extension}")
+                self.song_length = 0
+                self.total_time = "00:00"
+                self.total_time_label.configure(text=self.total_time)
+                self.song_slider.configure(to=100) # Fallback to a default max if length is unknown
+
+
         except Exception as e:
             # Default values if song length can't be determined
             print(f"Error getting song info: {e}")
@@ -591,7 +608,7 @@ class CyberpunkMusicPlayer:
             self.status_var.set("GENERATING WAVEFORM...")
             self.root.update()
 
-            # Convert MP3 to temporary WAV for processing
+            # Convert to AudioSegment
             sound = AudioSegment.from_file(self.current_song)
 
             # Get audio data
@@ -611,7 +628,7 @@ class CyberpunkMusicPlayer:
                 chunk = samples[i:i+chunk_size]
                 if len(chunk) > 0:
                     # Get normalized value (-1 to 1)
-                    value = np.abs(chunk).max() / 32768.0  # Assuming 16-bit audio
+                    value = np.abs(chunk).max() / 32768.0  # Assuming 16-bit audio, adjust if needed for other bit depths
                     self.waveform_data.append(value)
 
             # Reset position
