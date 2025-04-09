@@ -1,6 +1,6 @@
 MN-1: Engineered for Listening. Built in Python.
 
-Channeling the spirit of Braun and retro HiFi gear from the past, the MN-1 is a minimal Python MP3 player for the discerning ear.
+Channelling the spirit of Braun and retro HiFi gear from the past, the MN-1 is a minimal Python MP3 player for the discerning ear.
 
 Experience music uncluttered, with a clean interface and integrated waveform display focusing on the listening experience, free from distractions, just beautiful sound.
 
