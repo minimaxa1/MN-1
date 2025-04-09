@@ -1,0 +1,8 @@
+pip install
+
+customtkinter
+pygame
+Pillow
+mutagen
+numpy
+pydub
