@@ -1,4 +1,4 @@
-MN-1: Engineered for Listening. Built in Python.
+MN-1: Engineered for Listening, Built-in Python.
 
 Channelling the spirit of Braun and retro HiFi gear from the past, the MN-1 is a minimal Python MP3 player for the discerning ear.
 
@@ -8,7 +8,7 @@ The MN-1 strips away the unnecessary complexities of modern music players, offer
 
 * **Pure Python Core:**  Built from the ground up in Python, ensuring a clean and efficient foundation.
 
-* **Simple, Intuitive Interface:** Inspired by classic HiFi components, the MN-1 prioritizes ease of use and a distraction-free listening environment.  No bloated menus or unnecessary features.
+* **Simple, Intuitive Interface:** Inspired by classic HiFi components, the MN-1 prioritises ease of use and a distraction-free listening environment.  No bloated menus or unnecessary features.
 
 * **Real-time Waveform Display:** Visualize your music as it plays with a captivating and informative waveform display. Go beyond just hearing – see the dynamics of your tracks.
 
@@ -49,23 +49,19 @@ Install Dependencies (if any beyond Pygame): If there's a requirements.txt file 
 
 pip install -r requirements.txt
 
-Loading Music: Load mp3, wav files via the add option.
+Loading Music: Load mp3, wav and flac files via the add option.
 
-Playback Controls: Load mp3 files and use mouse to click on play and pause functions
+Playback Controls: Load mp3 files and use your mouse to click the play and pause functions (relatively simple yes)
 
 Technical Details:
 
 Language: Pure Python 3
 
-Dependencies:Pygame (for audio playback and waveform visualization)
-
+Dependencies: Pygame (for audio playback and waveform visualization)
 
 Platform: Cross-platform (will run on any system with Python and Pygame installed - Windows easy install via the .exe file)
 
-
-Contributing:
-
-MN-1 is an open-source project and welcomes contributions! If you'd like to contribute, please:
+Contributing: MN-1 is an open-source project and welcomes contributions! If you'd like to contribute, please:
 
 Fork the repository.
 
@@ -77,12 +73,10 @@ Submit a pull request with a clear description of your changes.
 
 We appreciate contributions that enhance the simplicity, functionality, and sound quality of MN-1, while staying true to the minimalist design philosophy.
 
-License:
-
-This project is licensed under the [GNU GENERAL PUBLIC LICENSE]. See the LICENSE file for details.
+License: This project is licensed under the [GNU GENERAL PUBLIC LICENSE]. See the LICENSE file for details.
 
 Enjoy the pure sound of MN-1!
 
-Bohemai
-
 Since you read this far, might as well have some free tracks to listen to: https://drive.google.com/drive/folders/1dzLRZiWVLEaIj0fswMHnzd7bWKeOt3cc?usp=sharing
+
+Bohemai
