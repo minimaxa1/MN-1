@@ -75,8 +75,8 @@ We appreciate contributions that enhance the simplicity, functionality, and soun
 
 License: This project is licensed under the [GNU GENERAL PUBLIC LICENSE]. See the LICENSE file for details.
 
-Enjoy the pure sound of MN-1!
-
 Since you read this far, might as well have some free tracks to listen to and the .exe file: https://drive.google.com/drive/folders/1dzLRZiWVLEaIj0fswMHnzd7bWKeOt3cc?usp=sharing
+
+Enjoy the pure sound of MN-1!
 
 Bohemai
