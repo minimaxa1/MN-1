@@ -77,6 +77,6 @@ License: This project is licensed under the [GNU GENERAL PUBLIC LICENSE]. See th
 
 Enjoy the pure sound of MN-1!
 
-Since you read this far, might as well have some free tracks to listen to: https://drive.google.com/drive/folders/1dzLRZiWVLEaIj0fswMHnzd7bWKeOt3cc?usp=sharing
+Since you read this far, might as well have some free tracks to listen to and the .exe file: https://drive.google.com/drive/folders/1dzLRZiWVLEaIj0fswMHnzd7bWKeOt3cc?usp=sharing
 
 Bohemai
