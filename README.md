@@ -9,7 +9,8 @@ Experience music uncluttered, with a clean interface and integrated waveform dis
 
 The MN-1 strips away the unnecessary complexities of modern music players, offering a streamlined experience centered around what truly matters: your music.  
 
-![MN-1 Green ](https://github.com/user-attachments/assets/1d093449-5857-4797-a8bb-6fd52eabdbd9)
+																																																					
+![MN-1 Green ](https://github.com/user-attachments/assets/1131c6ed-55b7-4fda-a105-7b9e8138b26b)
 
 
 Experience your music collection with:
@@ -23,6 +24,12 @@ Experience your music collection with:
 * **Focus on Sound Quality:**  The MN-1 is designed to deliver your MP3s with clarity and fidelity, letting the music speak for itself.
 
 * **Open Source Spirit:**  The MN-1 is open source and welcomes contributions from the community.  Built by music lovers, for music lovers.
+
+  
+
+
+https://github.com/user-attachments/assets/5d3235ec-ce26-46a5-a2ec-e1fac47474ba
+
 
 **Getting Started**
 
