@@ -2,6 +2,10 @@ MN-1: Engineered for Listening, Built-in Python.
 
 ![MN-1](https://github.com/user-attachments/assets/562f54fd-91c5-4558-9474-b3bb620d0461)
 
+![MN-1 Green ](https://github.com/user-attachments/assets/6ab65c29-d827-41da-b7f4-9425db018384)
+
+![MN-1 Green ](https://github.com/user-attachments/assets/b39ac0be-7b20-4804-b082-b4d62443802b)
+
 
 Channelling the spirit of Braun and retro HiFi gear from the past, the MN-1 is a minimal Python MP3, Wav, Flac music player for the discerning ear.
 
