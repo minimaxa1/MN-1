@@ -7,9 +7,9 @@ Channelling the spirit of Braun and retro HiFi gear from the past, the MN-1 is a
 
 Experience music uncluttered, with a clean interface and integrated waveform display focusing on the listening experience, free from distractions, just beautiful sound.
 
-The MN-1 strips away the unnecessary complexities of modern music players, offering a streamlined experience centered around what truly matters: your music.  
+The MN-1 strips away the unnecessary complexities of modern music players, offering a streamlined experience centered around what truly matters: your music.  	
 
-	Pro tip: Change your accent colours to get a fresh look: 																																																				
+Pro tip: Change your accent colours to get a fresh look: 																																																
 ![MN-1 Green ](https://github.com/user-attachments/assets/1131c6ed-55b7-4fda-a105-7b9e8138b26b)
 
 
