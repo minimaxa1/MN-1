@@ -30,9 +30,6 @@ Experience your music collection with:
 
 * **Open Source Spirit:**  The MN-1 is open source and welcomes contributions from the community.  Built by music lovers, for music lovers.
 
-  
-
-https://github.com/user-attachments/assets/5d3235ec-ce26-46a5-a2ec-e1fac47474ba
 
 
 **Getting Started**
