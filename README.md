@@ -36,6 +36,8 @@ Pillow
 mutagen
 numpy
 pydub
+ffmpeg
+matplotlib
 
 
 Installation:
