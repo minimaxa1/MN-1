@@ -43,7 +43,7 @@ Ready to experience minimalist music? Here's how to get the MN-1 running:
 
 * **Python 3.x:** Ensure you have Python 3 or later installed on your system.
 
-* **Pygame:**  MN-1 utilizes Pygame for audio playback and the waveform display. 
+* **Pygame:**  MN-1 utilises several dependencies for audio playback, oscillation and waveform display. 
 
 Install it using pip:
  
@@ -58,8 +58,6 @@ pydub
 ffmpeg
 matplotlib
 
-
-Installation:
 
 Clone the Repository:
 
