@@ -9,6 +9,9 @@ Experience music uncluttered, with a clean interface and integrated waveform dis
 
 The MN-1 strips away the unnecessary complexities of modern music players, offering a streamlined experience centered around what truly matters: your music.  
 
+![MN-1 Green ](https://github.com/user-attachments/assets/1d093449-5857-4797-a8bb-6fd52eabdbd9)
+
+
 Experience your music collection with:
 
 * **Pure Python Core:**  Built from the ground up in Python, ensuring a clean and efficient foundation.
@@ -85,3 +88,5 @@ Since you read this far, might as well have some free tracks to listen to and th
 Enjoy the pure sound of MN-1!
 
 Bohemai
+
+
