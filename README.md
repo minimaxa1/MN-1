@@ -52,19 +52,17 @@ Clone the Repository:
 git clone [repository-url]  # Replace [repository-url] with the actual GitHub repository URL
 cd mn-1
 
-Install Dependencies (if any beyond Pygame): If there's a requirements.txt file in the repository:
+Install Dependencies in the requirements.txt file in the repository:
 
 pip install -r requirements.txt
 
 Loading Music: Load mp3, wav and flac files via the add option.
 
-Playback Controls: Load mp3 files and use your mouse to click the play and pause functions (relatively simple yes)
+Playback Controls: Load mp3 files and use your mouse to click the play and pause functions (relatively simple)
 
 Technical Details:
 
 Language: Pure Python 3
-
-Dependencies: Pygame (for audio playback and waveform visualization)
 
 Platform: Cross-platform (will run on any system with Python and Pygame installed - Windows easy install via the .exe file)
 
