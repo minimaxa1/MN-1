@@ -11,7 +11,7 @@ Experience music uncluttered, with a clean interface and integrated waveform dis
 The MN-1 strips away the unnecessary complexities of modern music players, offering a streamlined experience centered around what truly matters: your music.  	
 
 
-Pro tip: Change your theme and accent colours to get a fresh look:
+Pro tip: Change your theme and accent colours to get a fresh aesthetic look:
 
 
 ![Light Theme ](https://github.com/user-attachments/assets/c7271f49-2c7f-47dc-9bc6-1b997efe5e7e)
