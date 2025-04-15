@@ -13,13 +13,10 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import traceback
 import subprocess # Keep for potential future use or if needed by other libs
-import sys # Keep for sys.frozen check (though FFmpeg part removed)
-
-# --- FFmpeg Path Setup Removed ---
-# Waveform generation now uses the 'soundfile' library.
-
+import sys # Keep for sys module usage
 
 # --- Color Definitions ---
+# THIS BLOCK MUST BE PRESENT AND CORRECT BEFORE THEMES DEFINITION
 COLOR_BLACK = "#000000"; COLOR_WHITE = "#FFFFFF"; COLOR_NEAR_WHITE = "#F5F5F5"
 COLOR_DEEP_RED = "#8B0000"; COLOR_LIGHT_RED_HOVER = "#A52A2A"; COLOR_BRIGHT_RED = "#FF0000"
 COLOR_DARK_GRAY = "#333333"; COLOR_LIGHT_GRAY = "#D3D3D3"; COLOR_MID_GRAY = "#404040"
@@ -50,20 +47,20 @@ COLOR_DARK_GREEN_DIM = "#004d00"
 COLOR_DARK_BLUE_DIM = "#000050"
 
 # --- Theme Palettes ---
+# THIS DICTIONARY MUST BE COMPLETE AND CORRECT
 THEMES = {
     "dark": {
         "L1_bg": COLOR_BLACK, "L2_element_dark": COLOR_MID_DARK_GRAY, "L3_accent_primary": COLOR_DEEP_RED,
         "L4_hover_bg": COLOR_DARK_GRAY, "L5_accent_secondary": COLOR_BRIGHT_RED, "L6_text_light": COLOR_WHITE,
-        "slider_button": COLOR_SILVER_L3,
+        "slider_button": COLOR_SILVER_L3, "slider_button_hover": COLOR_BRIGHT_RED, # Added hover
         "plot_bg": COLOR_BLACK, "plot_wave_main": COLOR_WHITE, "plot_osc_main": COLOR_DEEP_RED,
         "plot_wave_indicator": COLOR_BRIGHT_RED, "plot_spine": COLOR_WHITE, "plot_text": COLOR_WHITE,
         "list_scrollbar": COLOR_DARK_GRAY, "list_scrollbar_hover": COLOR_WHITE,
     },
     "light": {
         "L1_bg": COLOR_WHITE, "L2_element_dark": COLOR_LIGHT_GRAY, "L3_accent_primary": COLOR_DEEP_RED,
-        "L4_hover_bg": COLOR_VERY_LIGHT_GRAY,
-        "L5_accent_secondary": COLOR_BRIGHT_RED, "L6_text_light": COLOR_BLACK,
-        "slider_button": COLOR_BLACK,
+        "L4_hover_bg": COLOR_VERY_LIGHT_GRAY, "L5_accent_secondary": COLOR_BRIGHT_RED, "L6_text_light": COLOR_BLACK,
+        "slider_button": COLOR_BLACK, "slider_button_hover": COLOR_DEEP_RED, # Added hover
         "plot_bg": COLOR_WHITE, "plot_wave_main": COLOR_LIGHT_GRAY, "plot_osc_main": COLOR_DEEP_RED,
         "plot_wave_indicator": COLOR_BRIGHT_RED, "plot_spine": COLOR_BLACK, "plot_text": COLOR_BLACK,
         "list_scrollbar": COLOR_DEEP_RED, "list_scrollbar_hover": COLOR_BLACK,
@@ -71,7 +68,7 @@ THEMES = {
     "grey": {
         "L1_bg": COLOR_MID_GRAY, "L2_element_dark": COLOR_DARKER_MID_GRAY, "L3_accent_primary": COLOR_DEEP_RED,
         "L4_hover_bg": COLOR_LIGHTER_MID_GRAY, "L5_accent_secondary": COLOR_BRIGHT_RED, "L6_text_light": COLOR_WHITE,
-        "slider_button": COLOR_SILVER_L3,
+        "slider_button": COLOR_SILVER_L3, "slider_button_hover": COLOR_BRIGHT_RED, # Added hover
         "plot_bg": COLOR_MID_GRAY, "plot_wave_main": COLOR_SILVER_L3, "plot_osc_main": COLOR_DEEP_RED,
         "plot_wave_indicator": COLOR_BRIGHT_RED, "plot_spine": COLOR_SILVER_L3, "plot_text": COLOR_SILVER_L3,
         "list_scrollbar": COLOR_DEEP_RED, "list_scrollbar_hover": COLOR_WHITE,
@@ -79,7 +76,7 @@ THEMES = {
      "red": {
         "L1_bg": COLOR_DEEP_RED, "L2_element_dark": COLOR_DARK_RED_DIM, "L3_accent_primary": COLOR_WHITE,
         "L4_hover_bg": COLOR_LIGHT_RED_HOVER, "L5_accent_secondary": COLOR_LIGHT_GRAY, "L6_text_light": COLOR_WHITE,
-        "slider_button": COLOR_WHITE,
+        "slider_button": COLOR_WHITE, "slider_button_hover": COLOR_LIGHT_GRAY, # Added hover
         "plot_bg": COLOR_DEEP_RED, "plot_wave_main": COLOR_WHITE, "plot_osc_main": COLOR_WHITE,
         "plot_wave_indicator": COLOR_BLACK, "plot_spine": COLOR_WHITE, "plot_text": COLOR_WHITE,
         "list_scrollbar": COLOR_WHITE, "list_scrollbar_hover": COLOR_BLACK,
@@ -87,7 +84,7 @@ THEMES = {
      "gold": {
         "L1_bg": COLOR_BLACK, "L2_element_dark": COLOR_DARK_GOLD_DIM, "L3_accent_primary": COLOR_GOLD,
         "L4_hover_bg": COLOR_DARK_GOLD, "L5_accent_secondary": COLOR_LIGHT_GOLD, "L6_text_light": COLOR_NEAR_WHITE,
-        "slider_button": COLOR_NEAR_WHITE,
+        "slider_button": COLOR_NEAR_WHITE, "slider_button_hover": COLOR_LIGHT_GOLD,
         "plot_bg": COLOR_BLACK, "plot_wave_main": COLOR_GOLD, "plot_osc_main": COLOR_LIGHT_GOLD,
         "plot_wave_indicator": COLOR_LIGHT_GOLD, "plot_spine": COLOR_DARK_GOLD, "plot_text": COLOR_NEAR_WHITE,
         "list_scrollbar": COLOR_DARK_GOLD_DIM, "list_scrollbar_hover": COLOR_LIGHT_GOLD,
@@ -95,7 +92,7 @@ THEMES = {
     "orange": {
         "L1_bg": COLOR_BLACK, "L2_element_dark": COLOR_DARK_ORANGE_DIM, "L3_accent_primary": COLOR_ORANGE,
         "L4_hover_bg": COLOR_DARK_ORANGE, "L5_accent_secondary": COLOR_LIGHT_ORANGE, "L6_text_light": COLOR_NEAR_WHITE,
-        "slider_button": COLOR_NEAR_WHITE,
+        "slider_button": COLOR_NEAR_WHITE, "slider_button_hover": COLOR_LIGHT_ORANGE,
         "plot_bg": COLOR_BLACK, "plot_wave_main": COLOR_ORANGE, "plot_osc_main": COLOR_LIGHT_ORANGE,
         "plot_wave_indicator": COLOR_LIGHT_ORANGE, "plot_spine": COLOR_DARK_ORANGE, "plot_text": COLOR_NEAR_WHITE,
         "list_scrollbar": COLOR_DARK_ORANGE_DIM, "list_scrollbar_hover": COLOR_LIGHT_ORANGE,
@@ -103,7 +100,7 @@ THEMES = {
     "purple": {
         "L1_bg": COLOR_BLACK, "L2_element_dark": COLOR_DARK_PURPLE_DIM, "L3_accent_primary": COLOR_PURPLE,
         "L4_hover_bg": COLOR_DARK_PURPLE, "L5_accent_secondary": COLOR_LIGHT_PURPLE, "L6_text_light": COLOR_NEAR_WHITE,
-        "slider_button": COLOR_NEAR_WHITE,
+        "slider_button": COLOR_NEAR_WHITE, "slider_button_hover": COLOR_LIGHT_PURPLE,
         "plot_bg": COLOR_BLACK, "plot_wave_main": COLOR_PURPLE, "plot_osc_main": COLOR_LIGHT_PURPLE,
         "plot_wave_indicator": COLOR_LIGHT_PURPLE, "plot_spine": COLOR_DARK_PURPLE, "plot_text": COLOR_NEAR_WHITE,
         "list_scrollbar": COLOR_DARK_PURPLE_DIM, "list_scrollbar_hover": COLOR_LIGHT_PURPLE,
@@ -111,7 +108,7 @@ THEMES = {
     "green": {
         "L1_bg": COLOR_BLACK, "L2_element_dark": COLOR_DARK_GREEN_DIM, "L3_accent_primary": COLOR_GREEN,
         "L4_hover_bg": COLOR_DARK_GREEN, "L5_accent_secondary": COLOR_LIGHT_GREEN, "L6_text_light": COLOR_NEAR_WHITE,
-        "slider_button": COLOR_NEAR_WHITE,
+        "slider_button": COLOR_NEAR_WHITE, "slider_button_hover": COLOR_LIGHT_GREEN,
         "plot_bg": COLOR_BLACK, "plot_wave_main": COLOR_GREEN, "plot_osc_main": COLOR_LIGHT_GREEN,
         "plot_wave_indicator": COLOR_LIGHT_GREEN, "plot_spine": COLOR_DARK_GREEN, "plot_text": COLOR_NEAR_WHITE,
         "list_scrollbar": COLOR_DARK_GREEN_DIM, "list_scrollbar_hover": COLOR_LIGHT_GREEN,
@@ -119,7 +116,7 @@ THEMES = {
     "blue": {
         "L1_bg": COLOR_BLACK, "L2_element_dark": COLOR_DARK_BLUE_DIM, "L3_accent_primary": COLOR_BLUE,
         "L4_hover_bg": COLOR_DARK_BLUE, "L5_accent_secondary": COLOR_LIGHT_BLUE, "L6_text_light": COLOR_NEAR_WHITE,
-        "slider_button": COLOR_NEAR_WHITE,
+        "slider_button": COLOR_NEAR_WHITE, "slider_button_hover": COLOR_LIGHT_BLUE,
         "plot_bg": COLOR_BLACK, "plot_wave_main": COLOR_BLUE, "plot_osc_main": COLOR_LIGHT_BLUE,
         "plot_wave_indicator": COLOR_LIGHT_BLUE, "plot_spine": COLOR_DARK_BLUE, "plot_text": COLOR_NEAR_WHITE,
         "list_scrollbar": COLOR_DARK_BLUE_DIM, "list_scrollbar_hover": COLOR_LIGHT_BLUE,
@@ -127,7 +124,7 @@ THEMES = {
     "silver": {
         "L1_bg": COLOR_SILVER_L6, "L2_element_dark": COLOR_SILVER_L5, "L3_accent_primary": COLOR_SILVER_L3,
         "L4_hover_bg": COLOR_SILVER_L4, "L5_accent_secondary": COLOR_SILVER_L2, "L6_text_light": COLOR_SILVER_L1,
-        "slider_button": COLOR_SILVER_L1,
+        "slider_button": COLOR_SILVER_L1, "slider_button_hover": COLOR_SILVER_L2,
         "plot_bg": COLOR_SILVER_L6, "plot_wave_main": COLOR_SILVER_L3, "plot_osc_main": COLOR_SILVER_L3,
         "plot_wave_indicator": COLOR_SILVER_L2, "plot_spine": COLOR_SILVER_L5,
         "plot_text": COLOR_SILVER_L1,
@@ -200,51 +197,59 @@ class MN1MusicPlayer:
                 tkinter.messagebox.showerror("Pygame Error", f"Could not initialize audio output.\nError: {e}\n\nThe application might not play sound.")
             except: pass
 
+        # --- State Variables ---
         self.current_song = ""
         self.songs_list = []
         self.current_song_index = 0
         self.previous_volume = 0.5
         self.stopped_position = 0.0
-
         self.playing_state = False; self.paused = False; self.shuffle_state = False
         self.loop_state = 0; self.muted = False; self.slider_active = False
         self.waveform_dragging = False; self.is_seeking = False
         self.is_generating_waveform = False; self.is_loading = False; self.has_error = False
+        self.sidebar_visible = True # State for sidebar visibility
 
         try: pygame.mixer.music.set_volume(self.previous_volume)
         except Exception as e: print(f"Warning: Could not set initial volume: {e}")
 
+        # --- Fonts ---
         self.title_font = ("SF Mono", 16, "bold")
         self.normal_font = ("SF Mono", 11)
         self.button_font = ("SF Mono", 13, "bold")
         self.play_pause_button_font = ("SF Mono", 26, "bold")
 
+        # --- Plot Setup ---
         self.fig_wave, self.ax_wave = plt.subplots(figsize=(5, 1.5))
         self.mpl_canvas_widget_wave = None
         self.position_indicator_line_wave = None
-
         self.fig_osc, self.ax_osc = plt.subplots(figsize=(5, 0.8))
         self.mpl_canvas_widget_osc = None
         self.ax_osc.set_ylim(-1.1, 1.1)
 
+        # --- Waveform Data ---
         self.waveform_peak_data = None; self.raw_sample_data = None; self.sample_rate = None
         self.waveform_thread = None; self.waveform_abort_flag = threading.Event()
 
+        # --- Other Variables ---
         self.osc_window_seconds = 0.05; self.osc_downsample_factor = 5
         self.song_length = 0.0; self.song_time = 0.0
         self.time_elapsed = "00:00"; self.total_time = "00:00"
         self.update_thread = None; self.thread_running = False
         self.song_title_var = ctk.StringVar(value="NO SONG LOADED")
-        self.play_pause_button = None
 
+        # --- Declare UI Elements ---
+        self.play_pause_button = None
+        self.sidebar_toggle_button = None
+
+        # --- Create UI ---
         self.create_frames()
         self.create_player_area()
         self.create_waveform_display()
         self.create_oscilloscope_display()
         self.create_controls()
         self.create_tracklist_area()
-        self.apply_theme()
 
+        self.apply_theme()
         initial_theme = self.themes[self.current_theme_name]
         initial_spine_color = initial_theme['plot_spine']
         self.draw_initial_placeholder(self.ax_wave, self.fig_wave, initial_spine_color, "LOAD A SONG")
@@ -268,42 +273,74 @@ class MN1MusicPlayer:
              pass
 
     def create_frames(self):
+        self.root.grid_rowconfigure(0, weight=1)
+        self.root.grid_columnconfigure(0, weight=1)
         self.player_frame = ctk.CTkFrame(self.root, corner_radius=0)
-        self.player_frame.pack(pady=5, padx=10, fill="both", expand=True)
-        self.left_frame = ctk.CTkFrame(self.player_frame, width=500, corner_radius=0)
-        self.left_frame.pack(side="left", fill="both", expand=True, padx=(0, 5))
-        self.right_frame = ctk.CTkFrame(self.player_frame, width=300, corner_radius=0)
-        self.right_frame.pack(side="right", fill="both", expand=True, padx=(5, 0))
+        self.player_frame.grid(row=0, column=0, sticky="nsew", padx=10, pady=5)
+
+        self.player_frame.grid_columnconfigure(0, weight=2) # Left frame column
+        self.player_frame.grid_columnconfigure(1, weight=1) # Right frame column (initially)
+        self.player_frame.grid_rowconfigure(0, weight=1)
+
+        self.left_frame = ctk.CTkFrame(self.player_frame, corner_radius=0)
+        self.left_frame.grid(row=0, column=0, sticky="nsew", padx=(0, 5))
+        self.right_frame = ctk.CTkFrame(self.player_frame, corner_radius=0)
+        # Grid placement for right_frame happens in create_tracklist_area
+
+        self.left_frame.grid_rowconfigure(0, weight=1) # Visual frame row
+        self.left_frame.grid_rowconfigure(1, weight=0) # Controls frame row
+        self.left_frame.grid_columnconfigure(0, weight=1)
+
         self.controls_frame = ctk.CTkFrame(self.left_frame, height=80, corner_radius=0)
-        self.controls_frame.pack(side="bottom", fill="x", pady=(5,5))
+        self.controls_frame.grid(row=1, column=0, sticky="ew", pady=(5,5))
         self.visual_frame = ctk.CTkFrame(self.left_frame, corner_radius=0)
-        self.visual_frame.pack(side="top", fill="both", expand=True, pady=(0,5))
+        self.visual_frame.grid(row=0, column=0, sticky="nsew", pady=(0,5))
+
+        self.visual_frame.grid_columnconfigure(0, weight=1)
+        self.visual_frame.grid_rowconfigure(0, weight=0) # Info
+        self.visual_frame.grid_rowconfigure(1, weight=0) # Wave
+        self.visual_frame.grid_rowconfigure(2, weight=0) # Osc
+        self.visual_frame.grid_rowconfigure(3, weight=1) # Spacer
+        self.visual_frame.grid_rowconfigure(4, weight=0) # Slider
+
 
     def create_player_area(self):
         self.info_frame = ctk.CTkFrame(self.visual_frame, corner_radius=0)
-        self.info_frame.pack(fill="x", pady=(0,5))
+        self.info_frame.grid(row=0, column=0, sticky="ew", pady=(0,5))
         self.song_title_label = ctk.CTkLabel(self.info_frame, textvariable=self.song_title_var, font=self.title_font, anchor="w")
         self.song_title_label.pack(fill="x", padx=10, pady=(0, 2))
+
         WAVEFORM_HEIGHT = 70
         self.waveform_frame = ctk.CTkFrame(self.visual_frame, corner_radius=0, height=WAVEFORM_HEIGHT)
-        self.waveform_frame.pack(fill="x", expand=False, padx=10, pady=(0, 1), ipady=0)
+        self.waveform_frame.grid(row=1, column=0, sticky="ew", padx=10, pady=(0, 1))
+
         OSCILLOSCOPE_HEIGHT = 35
         self.oscilloscope_frame = ctk.CTkFrame(self.visual_frame, corner_radius=0, height=OSCILLOSCOPE_HEIGHT)
-        self.oscilloscope_frame.pack(fill="x", expand=False, padx=10, pady=(1, 5), ipady=0)
-        self.spacer_frame = ctk.CTkFrame(self.visual_frame, height=0)
-        self.spacer_frame.pack(fill="both", expand=True, pady=0, padx=0)
+        self.oscilloscope_frame.grid(row=2, column=0, sticky="ew", padx=10, pady=(1, 5))
+
+        self.spacer_frame = ctk.CTkFrame(self.visual_frame, height=0, fg_color="transparent")
+        self.spacer_frame.grid(row=3, column=0, sticky="nsew")
+
         self.slider_frame = ctk.CTkFrame(self.visual_frame, corner_radius=0)
-        self.slider_frame.pack(fill="x", pady=(0,5), padx=10)
+        self.slider_frame.grid(row=4, column=0, sticky="ew", pady=(0,5), padx=10)
+
+        self.slider_frame.grid_columnconfigure(0, weight=1)
+        self.slider_frame.grid_rowconfigure(0, weight=0)
+        self.slider_frame.grid_rowconfigure(1, weight=0)
+
         self.song_slider = ctk.CTkSlider(self.slider_frame, from_=0, to=100, command=self.slide_song, variable=ctk.DoubleVar())
-        self.song_slider.pack(fill="x", pady=5)
+        self.song_slider.grid(row=0, column=0, sticky="ew", pady=5)
         self.song_slider.bind("<ButtonPress-1>", self.slider_start_scroll)
         self.song_slider.bind("<ButtonRelease-1>", self.slider_stop_scroll)
+
         self.time_frame = ctk.CTkFrame(self.slider_frame, corner_radius=0)
-        self.time_frame.pack(fill="x")
+        self.time_frame.grid(row=1, column=0, sticky="ew")
+
         self.current_time_label = ctk.CTkLabel(self.time_frame, text="00:00", font=self.normal_font)
         self.current_time_label.pack(side="left", padx=(0, 5))
         self.total_time_label = ctk.CTkLabel(self.time_frame, text="00:00", font=self.normal_font)
         self.total_time_label.pack(side="right", padx=(5, 0))
+
 
     def create_waveform_display(self):
         self.mpl_canvas_widget_wave = FigureCanvasTkAgg(self.fig_wave, master=self.waveform_frame)
@@ -330,7 +367,9 @@ class MN1MusicPlayer:
             font_size = 7 if fig == self.fig_osc else 9
             if message: ax.text(0.5, 0.5, message, ha='center', va='center', fontsize=font_size, color=text_color, transform=ax.transAxes, fontfamily='SF Mono')
             if ax == self.ax_osc: ax.set_ylim(-1.1, 1.1)
-            fig.canvas.draw_idle()
+            # Use try-except for draw_idle as canvas might not be fully ready initially
+            try: fig.canvas.draw_idle()
+            except Exception: pass
             if ax == self.ax_wave: self.position_indicator_line_wave = None
         except Exception as e: print(f"Error drawing placeholder: {e}")
 
@@ -338,46 +377,104 @@ class MN1MusicPlayer:
         self.buttons_frame = ctk.CTkFrame(self.controls_frame, corner_radius=0)
         self.buttons_frame.pack(pady=(5,0), anchor="center")
         button_kwargs = {"font": self.button_font, "border_width": 0, "corner_radius": 0, "width": 70, "height": 56}
-        self.prev_button = ctk.CTkButton(self.buttons_frame, text="◄◄", command=self.previous_song, **button_kwargs)
-        self.prev_button.grid(row=0, column=0, padx=4)
-        self.play_pause_button = ctk.CTkButton(self.buttons_frame, text="▶", command=self.toggle_play_pause, **button_kwargs)
-        self.play_pause_button.grid(row=0, column=1, padx=4)
-        self.next_button = ctk.CTkButton(self.buttons_frame, text="►►", command=self.next_song, **button_kwargs)
-        self.next_button.grid(row=0, column=2, padx=4)
-        if self.play_pause_button and self.play_pause_button.winfo_exists():
-            self.play_pause_button.configure(font=self.play_pause_button_font)
+        self.prev_button = ctk.CTkButton(self.buttons_frame, text="◄◄", command=self.previous_song, **button_kwargs); self.prev_button.grid(row=0, column=0, padx=4)
+        self.play_pause_button = ctk.CTkButton(self.buttons_frame, text="▶", command=self.toggle_play_pause, **button_kwargs); self.play_pause_button.grid(row=0, column=1, padx=4)
+        self.next_button = ctk.CTkButton(self.buttons_frame, text="►►", command=self.next_song, **button_kwargs); self.next_button.grid(row=0, column=2, padx=4)
+        if self.play_pause_button and self.play_pause_button.winfo_exists(): self.play_pause_button.configure(font=self.play_pause_button_font)
+
         self.extra_frame = ctk.CTkFrame(self.controls_frame, corner_radius=0)
         self.extra_frame.pack(pady=(2,5), anchor="center")
         extra_button_kwargs = {"font": self.normal_font, "border_width": 0, "corner_radius": 0, "width": 65, "height": 25}
         theme_button_kwargs = {"font": self.normal_font, "border_width": 0, "corner_radius": 0, "width": 65, "height": 25}
+
+        self.sidebar_toggle_button = ctk.CTkButton(self.extra_frame, text="SIDE", command=self.toggle_sidebar, **extra_button_kwargs)
+        self.sidebar_toggle_button.grid(row=0, column=0, padx=3)
         self.theme_toggle_button = ctk.CTkButton(self.extra_frame, text="MN-1", command=self.toggle_theme,**theme_button_kwargs)
-        self.theme_toggle_button.grid(row=0, column=0, padx=3)
+        self.theme_toggle_button.grid(row=0, column=1, padx=3)
         self.mix_button = ctk.CTkButton(self.extra_frame, text="MIX", command=self.toggle_mix, **extra_button_kwargs)
-        self.mix_button.grid(row=0, column=1, padx=3)
+        self.mix_button.grid(row=0, column=2, padx=3)
         self.loop_button = ctk.CTkButton(self.extra_frame, text="LOOP", command=self.toggle_loop, **extra_button_kwargs)
-        self.loop_button.grid(row=0, column=2, padx=3)
+        self.loop_button.grid(row=0, column=3, padx=3)
         self.volume_button = ctk.CTkButton(self.extra_frame, text="VOL", command=self.toggle_mute, **extra_button_kwargs)
-        self.volume_button.grid(row=0, column=3, padx=3)
+        self.volume_button.grid(row=0, column=4, padx=3)
         self.volume_slider = ctk.CTkSlider(self.extra_frame, from_=0, to=1, number_of_steps=100, command=self.volume_adjust, width=90, height=18);
         self.volume_slider.set(self.previous_volume)
-        self.volume_slider.grid(row=0, column=4, padx=(3, 10), pady=(0,3))
+        self.volume_slider.grid(row=0, column=5, padx=(3, 10), pady=(0,3))
 
     def create_tracklist_area(self):
+        # Place the right frame in the grid
+        self.right_frame.grid(row=0, column=1, sticky="nsew", padx=(5, 0))
+
+        self.right_frame.grid_columnconfigure(0, weight=1)
+        self.right_frame.grid_rowconfigure(0, weight=0) # Label row
+        self.right_frame.grid_rowconfigure(1, weight=1) # Playlist row (expand)
+        self.right_frame.grid_rowconfigure(2, weight=0) # Buttons row
+
         self.playlist_label_frame = ctk.CTkFrame(self.right_frame, corner_radius=0)
-        self.playlist_label_frame.pack(fill="x", pady=5)
+        self.playlist_label_frame.grid(row=0, column=0, sticky="ew", pady=5)
         self.tracklist_label = ctk.CTkLabel(self.playlist_label_frame, text="TRACKLIST", font=self.title_font)
         self.tracklist_label.pack(anchor="center")
+
         self.playlist_frame = ctk.CTkFrame(self.right_frame, corner_radius=0)
-        self.playlist_frame.pack(fill="both", expand=True, padx=5, pady=0)
+        self.playlist_frame.grid(row=1, column=0, sticky="nsew", padx=5, pady=0)
+        self.playlist_frame.grid_rowconfigure(0, weight=1)
+        self.playlist_frame.grid_columnconfigure(0, weight=1)
+
         self.playlist_scrollable = ctk.CTkScrollableFrame(self.playlist_frame)
-        self.playlist_scrollable.pack(fill="both", expand=True)
+        self.playlist_scrollable.grid(row=0, column=0, sticky="nsew")
         self.playlist_entries = []
+
         self.playlist_buttons_frame = ctk.CTkFrame(self.right_frame, corner_radius=0)
-        self.playlist_buttons_frame.pack(fill="x", pady=(5,10))
-        playlist_button_kwargs = {"font": self.normal_font, "border_width": 0, "corner_radius": 0, "width": 70, "height": 25}
-        self.load_button = ctk.CTkButton(self.playlist_buttons_frame, text="LOAD", command=self.add_songs, **playlist_button_kwargs); self.load_button.pack(side="left", padx=5, expand=True)
-        self.remove_button = ctk.CTkButton(self.playlist_buttons_frame, text="REMOVE", command=self.remove_song, **playlist_button_kwargs); self.remove_button.pack(side="left", padx=5, expand=True)
-        self.clear_button = ctk.CTkButton(self.playlist_buttons_frame, text="CLEAR", command=self.clear_playlist, **playlist_button_kwargs); self.clear_button.pack(side="left", padx=5, expand=True)
+        self.playlist_buttons_frame.grid(row=2, column=0, sticky="ew", pady=(5,10))
+        self.playlist_buttons_frame.grid_columnconfigure(0, weight=1)
+        self.playlist_buttons_frame.grid_columnconfigure(1, weight=1)
+        self.playlist_buttons_frame.grid_columnconfigure(2, weight=1)
+
+        playlist_button_kwargs = {"font": self.normal_font, "border_width": 0, "corner_radius": 0}
+        self.load_button = ctk.CTkButton(self.playlist_buttons_frame, text="LOAD", command=self.add_songs, **playlist_button_kwargs)
+        self.load_button.grid(row=0, column=0, padx=5, pady=5, sticky="ew")
+        self.remove_button = ctk.CTkButton(self.playlist_buttons_frame, text="REMOVE", command=self.remove_song, **playlist_button_kwargs)
+        self.remove_button.grid(row=0, column=1, padx=5, pady=5, sticky="ew")
+        self.clear_button = ctk.CTkButton(self.playlist_buttons_frame, text="CLEAR", command=self.clear_playlist, **playlist_button_kwargs)
+        self.clear_button.grid(row=0, column=2, padx=5, pady=5, sticky="ew")
+
+    def toggle_sidebar(self):
+        if self.sidebar_visible:
+            self.right_frame.grid_forget()
+            self.player_frame.grid_columnconfigure(0, weight=1) # Left takes all
+            self.player_frame.grid_columnconfigure(1, weight=0) # Right takes none
+            self.sidebar_visible = False
+            print("Sidebar hidden")
+        else:
+            self.right_frame.grid(row=0, column=1, sticky="nsew", padx=(5, 0)) # Put it back
+            self.player_frame.grid_columnconfigure(0, weight=2) # Restore weights
+            self.player_frame.grid_columnconfigure(1, weight=1)
+            self.sidebar_visible = True
+            print("Sidebar shown")
+
+        self.apply_sidebar_button_state()
+        self.root.after(10, self._redraw_plots_after_toggle)
+
+    def _redraw_plots_after_toggle(self):
+        try:
+            if self.fig_wave and self.fig_wave.canvas: self.fig_wave.canvas.draw_idle()
+            if self.fig_osc and self.fig_osc.canvas: self.fig_osc.canvas.draw_idle()
+            # Explicitly update layout of the canvas widget might help sometimes
+            if self.mpl_canvas_widget_wave and self.mpl_canvas_widget_wave.get_tk_widget().winfo_exists():
+                self.mpl_canvas_widget_wave.get_tk_widget().update_idletasks()
+            if self.mpl_canvas_widget_osc and self.mpl_canvas_widget_osc.get_tk_widget().winfo_exists():
+                 self.mpl_canvas_widget_osc.get_tk_widget().update_idletasks()
+
+        except Exception as e: print(f"Error redrawing plots after toggle: {e}")
+
+    def apply_sidebar_button_state(self):
+        if not (self.sidebar_toggle_button and self.sidebar_toggle_button.winfo_exists()): return
+        theme = self.themes[self.current_theme_name]
+        base_text_col = COLOR_BLACK if self.current_theme_name == "light" else theme["L6_text_light"]
+        accent_col = theme["L3_accent_primary"]
+        # Highlight when hidden (action is to show)
+        color = accent_col if not self.sidebar_visible else base_text_col
+        self.sidebar_toggle_button.configure(text_color=color)
 
     def toggle_theme(self):
         try:
@@ -401,10 +498,19 @@ class MN1MusicPlayer:
         plot_bg_col = theme["plot_bg"]; plot_spine_col = theme["plot_spine"]; plot_text_col = theme["plot_text"]
         try:
             self.root.configure(fg_color=bg_col)
-            for frame in [self.player_frame, self.left_frame, self.right_frame, self.controls_frame, self.visual_frame, self.info_frame, self.waveform_frame, self.oscilloscope_frame, self.spacer_frame, self.slider_frame, self.time_frame, self.playlist_label_frame, self.playlist_frame, self.playlist_buttons_frame, self.buttons_frame, self.extra_frame]:
-                if frame and frame.winfo_exists(): frame.configure(fg_color=bg_col)
+            for frame in [self.player_frame, self.left_frame, self.right_frame,
+                          self.controls_frame, self.visual_frame, self.info_frame,
+                          self.waveform_frame, self.oscilloscope_frame, self.spacer_frame,
+                          self.slider_frame, self.time_frame, self.playlist_label_frame,
+                          self.playlist_frame, self.playlist_buttons_frame,
+                          self.buttons_frame, self.extra_frame]:
+                if frame and frame.winfo_exists():
+                     if frame is self.spacer_frame: frame.configure(fg_color="transparent")
+                     else: frame.configure(fg_color=bg_col)
+
             for label in [self.song_title_label, self.current_time_label, self.total_time_label, self.tracklist_label]:
-                 if label and label.winfo_exists(): label.configure(fg_color=bg_col, text_color=text_col)
+                 if label and label.winfo_exists(): label.configure(fg_color="transparent", text_color=text_col)
+
             main_button_fg = bg_col; main_button_text = text_col
             if self.current_theme_name == "light": main_button_fg = COLOR_WHITE; main_button_text = COLOR_BLACK
             for btn in [self.prev_button, self.play_pause_button, self.next_button]:
@@ -412,34 +518,43 @@ class MN1MusicPlayer:
                      btn.configure(fg_color=main_button_fg, text_color=main_button_text, hover_color=hover_col)
                      if btn is self.play_pause_button: btn.configure(font=self.play_pause_button_font)
                      else: btn.configure(font=self.button_font)
+
             extra_button_fg = main_button_fg; extra_button_text = main_button_text
-            extra_buttons = [self.mix_button, self.loop_button, self.volume_button, self.theme_toggle_button, self.load_button, self.remove_button, self.clear_button]
+            extra_buttons = [self.sidebar_toggle_button, self.mix_button, self.loop_button, self.volume_button,
+                             self.theme_toggle_button, self.load_button, self.remove_button, self.clear_button]
             for btn in extra_buttons:
                  if btn and btn.winfo_exists():
                      btn.configure(fg_color=extra_button_fg, hover_color=hover_col)
                      if btn is self.theme_toggle_button: btn.configure(text_color=accent_col)
-                     else: btn.configure(text_color=extra_button_text)
+                     elif btn is self.sidebar_toggle_button: self.apply_sidebar_button_state()
+                     else: btn.configure(text_color=extra_button_text) # Base color first
+
             if self.theme_toggle_button and self.theme_toggle_button.winfo_exists(): self.theme_toggle_button.configure(text=theme_button_display_text)
+
             if self.song_slider and self.song_slider.winfo_exists(): self.song_slider.configure(fg_color=element_dark_col, progress_color=accent_col, button_color=slider_button_col, button_hover_color=slider_button_hover_col)
             if self.volume_slider and self.volume_slider.winfo_exists(): self.volume_slider.configure(fg_color=element_dark_col, progress_color=accent_col, button_color=slider_button_col, button_hover_color=slider_button_hover_col)
             if self.playlist_scrollable and self.playlist_scrollable.winfo_exists(): self.playlist_scrollable.configure(fg_color=bg_col, scrollbar_button_color=list_scrollbar_col, scrollbar_button_hover_color=list_scrollbar_hover_col)
+
             mute_color = accent_col if self.muted else extra_button_text; mute_text = "MUTED" if self.muted else "VOL"
             if self.volume_button and self.volume_button.winfo_exists(): self.volume_button.configure(text_color=mute_color, text=mute_text)
             mix_color = accent_col if self.shuffle_state else extra_button_text
             if self.mix_button and self.mix_button.winfo_exists(): self.mix_button.configure(text_color=mix_color)
-            # Re-apply loop button text/color after theme change
-            self.apply_loop_button_state() # Call helper
+            self.apply_loop_button_state()
+            self.apply_sidebar_button_state()
 
             selected_idx = -1
             for i, entry in enumerate(self.playlist_entries):
                  if entry and entry.get("frame") and entry["frame"].winfo_exists() and entry.get("selected"): selected_idx = i; break
             if selected_idx != -1: self.select_song(selected_idx)
             else:
+                 bg_color_default = theme["L1_bg"]; text_color_default = theme["L6_text_light"]
                  for entry in self.playlist_entries:
                     try:
-                        if entry and entry.get("label") and entry["label"].winfo_exists(): entry["label"].configure(fg_color=bg_col, text_color=text_col)
-                        if entry and entry.get("frame") and entry["frame"].winfo_exists(): entry["frame"].configure(fg_color=bg_col)
+                        if entry and not entry.get("selected"):
+                            if entry.get("frame") and entry["frame"].winfo_exists(): entry["frame"].configure(fg_color=bg_color_default)
+                            if entry.get("label") and entry["label"].winfo_exists(): entry["label"].configure(fg_color="transparent", text_color=text_color_default)
                     except Exception: pass
+
             if self.ax_wave and self.fig_wave and self.fig_wave.canvas:
                 self._configure_axes(self.ax_wave, self.fig_wave, plot_spine_col, plot_bg_col)
                 if self.waveform_peak_data is not None: self.draw_static_matplotlib_waveform()
@@ -454,6 +569,8 @@ class MN1MusicPlayer:
             print(f"Error applying theme '{self.current_theme_name}': {e}")
             traceback.print_exc()
 
+    # --- Methods from _update_display_title to on_closing remain the same ---
+    # ... (Paste all those methods here unchanged) ...
     def _update_display_title(self, base_title=""):
         prefix = ""
         title = base_title if base_title else os.path.basename(self.current_song) if self.current_song else "NO SONG LOADED"
@@ -494,7 +611,7 @@ class MN1MusicPlayer:
         list_item_bg = theme["L1_bg"]; list_item_fg = theme["L6_text_light"]
         song_frame = ctk.CTkFrame(self.playlist_scrollable, fg_color=list_item_bg, corner_radius=0)
         song_frame.pack(fill="x", pady=1, ipady=1)
-        song_label = ctk.CTkLabel(song_frame, text=song_name, font=self.normal_font, fg_color=list_item_bg, text_color=list_item_fg, anchor="w", justify="left", cursor="hand2")
+        song_label = ctk.CTkLabel(song_frame, text=song_name, font=self.normal_font, fg_color="transparent", text_color=list_item_fg, anchor="w", justify="left", cursor="hand2")
         song_label.pack(fill="x", padx=5)
         song_label.bind("<Button-1>", lambda e, idx=index: self.select_song(idx))
         song_label.bind("<Double-Button-1>", lambda e, idx=index: self.play_selected_song_by_index(idx))
@@ -503,13 +620,25 @@ class MN1MusicPlayer:
     def select_song(self, index):
         if not (0 <= index < len(self.playlist_entries)): return
         theme = self.themes[self.current_theme_name]
-        selected_color = theme["L3_accent_primary"]; default_fg_color = theme["L6_text_light"]; bg_color = theme["L1_bg"]
+        selected_bg_color = theme["L3_accent_primary"]
+        default_bg_color = theme["L1_bg"]
+        # Define selected text color based on theme for better contrast
+        if self.current_theme_name in ["red"]: # Themes where accent is light/white
+             selected_text_color = COLOR_BLACK # Or theme["L1_bg"] if that's dark
+        elif self.current_theme_name in ["light"]:
+             selected_text_color = COLOR_WHITE
+        else: # Most dark themes
+             selected_text_color = theme["L6_text_light"] # Default contrast
+
+        default_text_color = theme["L6_text_light"]
+
         for i, entry in enumerate(self.playlist_entries):
             is_selected = (i == index)
-            text_color = selected_color if is_selected else default_fg_color
+            frame_bg = selected_bg_color if is_selected else default_bg_color
+            text_color = selected_text_color if is_selected else default_text_color
             try:
-                if entry and entry.get("frame") and entry["frame"].winfo_exists(): entry["frame"].configure(fg_color=bg_color)
-                if entry and entry.get("label") and entry["label"].winfo_exists(): entry["label"].configure(fg_color=bg_color, text_color=text_color)
+                if entry and entry.get("frame") and entry["frame"].winfo_exists(): entry["frame"].configure(fg_color=frame_bg)
+                if entry and entry.get("label") and entry["label"].winfo_exists(): entry["label"].configure(fg_color="transparent", text_color=text_color)
             except Exception as e:
                 if "invalid command name" not in str(e).lower(): print(f"Warning: Error configuring tracklist entry {i} during select: {e}")
             if entry: entry["selected"] = is_selected
@@ -531,20 +660,27 @@ class MN1MusicPlayer:
         else: self._update_display_title()
 
     def remove_song(self):
-        removed_index = -1; is_current_song_removed = False
+        removed_index = -1; is_current_song_removed = False; current_selected_index = -1
         for i, entry in enumerate(self.playlist_entries):
-             if entry and entry.get("frame") and entry["frame"].winfo_exists() and entry.get("selected"): removed_index = i; break
-        if removed_index == -1: print("NO TRACK SELECTED"); return
+             if entry and entry.get("frame") and entry["frame"].winfo_exists() and entry.get("selected"): current_selected_index = i; break
+        if current_selected_index == -1: print("NO TRACK SELECTED"); return
+        removed_index = current_selected_index
         current_song_path = self.songs_list[removed_index] if removed_index < len(self.songs_list) else None
         if current_song_path and removed_index == self.current_song_index and self.current_song == current_song_path: is_current_song_removed = True
         if removed_index < len(self.playlist_entries):
              try:
                  if self.playlist_entries[removed_index]["frame"].winfo_exists(): self.playlist_entries[removed_index]["frame"].destroy()
              except Exception: pass
-             self.playlist_entries.pop(removed_index)
+             removed_entry_data = self.playlist_entries.pop(removed_index)
+        else: print("Warning: Playlist entry index mismatch during remove."); return
         if removed_index < len(self.songs_list): removed_song_path = self.songs_list.pop(removed_index); print(f"Removed: {os.path.basename(removed_song_path)}")
-        else: print("Warning: Index mismatch during remove."); return
-        for i in range(removed_index, len(self.playlist_entries)):
+        else: print("Warning: Song list index mismatch during remove."); return
+        new_selected_index = -1
+        if is_current_song_removed: new_selected_index = removed_index if removed_index < len(self.playlist_entries) else removed_index - 1
+        else:
+            if self.current_song_index > removed_index: self.current_song_index -= 1
+            new_selected_index = self.current_song_index
+        for i in range(len(self.playlist_entries)):
             entry = self.playlist_entries[i]
             if entry:
                 entry["index"] = i
@@ -565,24 +701,24 @@ class MN1MusicPlayer:
             if self.total_time_label and self.total_time_label.winfo_exists(): self.total_time_label.configure(text="00:00");
             if self.current_time_label and self.current_time_label.winfo_exists(): self.current_time_label.configure(text="00:00");
             if self.song_slider and self.song_slider.winfo_exists(): self.song_slider.set(0); self.song_slider.configure(to=100)
-        if len(self.songs_list) == 0:
-            self.current_song_index = 0
-            if not is_current_song_removed:
-                 self.current_song = ""; self.has_error = False; self.is_loading = False; self.is_generating_waveform = False;
-                 self._update_display_title(base_title="TRACKLIST EMPTY")
-                 if self.play_pause_button and self.play_pause_button.winfo_exists(): self.play_pause_button.configure(text="▶")
-                 theme = self.themes[self.current_theme_name]; spine_color = theme['plot_spine']
-                 self.draw_initial_placeholder(self.ax_wave, self.fig_wave, spine_color, "TRACKLIST EMPTY")
-                 self.draw_initial_placeholder(self.ax_osc, self.fig_osc, spine_color, "")
-                 self.raw_sample_data = None; self.waveform_peak_data = None; self.sample_rate = None; self.song_length = 0;
-                 if self.total_time_label and self.total_time_label.winfo_exists(): self.total_time_label.configure(text="00:00");
-                 if self.current_time_label and self.current_time_label.winfo_exists(): self.current_time_label.configure(text="00:00");
-                 if self.song_slider and self.song_slider.winfo_exists(): self.song_slider.set(0); self.song_slider.configure(to=100)
-        elif removed_index < self.current_song_index: self.current_song_index -= 1
-        elif removed_index == self.current_song_index and not is_current_song_removed: self.current_song_index = min(removed_index, len(self.songs_list) - 1)
-        if not is_current_song_removed and self.songs_list:
-            new_index_to_select = min(self.current_song_index, len(self.playlist_entries) - 1)
-            if new_index_to_select >= 0: self.select_song(new_index_to_select)
+            if len(self.playlist_entries) > 0:
+                 select_idx = max(0, min(new_selected_index, len(self.playlist_entries) - 1))
+                 self.select_song(select_idx)
+                 self.current_song_index = select_idx
+            elif len(self.songs_list) == 0: self._update_display_title(base_title="TRACKLIST EMPTY")
+        elif len(self.songs_list) == 0:
+            self.current_song_index = 0; self.current_song = ""; self.has_error = False; self.is_loading = False; self.is_generating_waveform = False;
+            self._update_display_title(base_title="TRACKLIST EMPTY")
+            if self.play_pause_button and self.play_pause_button.winfo_exists(): self.play_pause_button.configure(text="▶")
+            theme = self.themes[self.current_theme_name]; spine_color = theme['plot_spine']
+            self.draw_initial_placeholder(self.ax_wave, self.fig_wave, spine_color, "TRACKLIST EMPTY")
+            self.draw_initial_placeholder(self.ax_osc, self.fig_osc, spine_color, "")
+            self.raw_sample_data = None; self.waveform_peak_data = None; self.sample_rate = None; self.song_length = 0;
+            if self.total_time_label and self.total_time_label.winfo_exists(): self.total_time_label.configure(text="00:00");
+            if self.current_time_label and self.current_time_label.winfo_exists(): self.current_time_label.configure(text="00:00");
+            if self.song_slider and self.song_slider.winfo_exists(): self.song_slider.set(0); self.song_slider.configure(to=100)
+        else:
+             if 0 <= new_selected_index < len(self.playlist_entries): self.select_song(new_selected_index)
 
     def clear_playlist(self):
         self.stop();
@@ -801,33 +937,21 @@ class MN1MusicPlayer:
         color = accent_col if self.shuffle_state else base_text_col
         if self.mix_button and self.mix_button.winfo_exists(): self.mix_button.configure(text_color=color)
 
-    # --- toggle_loop CORRECTED ---
     def toggle_loop(self):
         self.loop_state = (self.loop_state + 1) % 3
         print(f"Loop toggled: State {self.loop_state}")
         self.apply_loop_button_state()
 
     def apply_loop_button_state(self):
-        """Helper to update loop button appearance based on state and theme."""
-        if not (self.loop_button and self.loop_button.winfo_exists()):
-            return # Skip if button doesn't exist
-
+        if not (self.loop_button and self.loop_button.winfo_exists()): return
         theme = self.themes[self.current_theme_name]
         base_text_col = COLOR_BLACK if self.current_theme_name == "light" else theme["L6_text_light"]
         accent_col = theme["L3_accent_primary"]
         color = accent_col if self.loop_state > 0 else base_text_col
-
-        # Determine loop text based on state
-        if self.loop_state == 1:
-            loop_text = "LOOP ALL"
-        elif self.loop_state == 2:
-            loop_text = "LOOP ONE"
-        else: # loop_state == 0
-            loop_text = "LOOP"
-
-        # Apply color and text to button
+        if self.loop_state == 1: loop_text = "LOOP ALL"
+        elif self.loop_state == 2: loop_text = "LOOP ONE"
+        else: loop_text = "LOOP"
         self.loop_button.configure(text_color=color, text=loop_text)
-    # --- End toggle_loop correction ---
 
     def slider_start_scroll(self, event):
         if self.current_song and self.song_length > 0: self.slider_active = True
@@ -955,43 +1079,30 @@ class MN1MusicPlayer:
         self.waveform_thread = threading.Thread(target=self.generate_waveform_data_background, args=(self.current_song, self.waveform_abort_flag), daemon=True)
         self.waveform_thread.start()
 
-    # --- generate_waveform_data_background using soundfile ---
     def generate_waveform_data_background(self, song_path, abort_flag):
         local_peak_data = None; local_raw_data = None; effective_sample_rate = None; error_message = None
         try:
             start_time = time.monotonic()
-            if abort_flag.is_set():
-                print("BG_THREAD: Waveform generation aborted early.")
-                return
+            if abort_flag.is_set(): return
             if not os.path.exists(song_path): raise FileNotFoundError(f"Audio file not found: {song_path}")
 
             try:
                 audio_data, original_sample_rate = sf.read(song_path, dtype='float64', always_2d=True)
-                if abort_flag.is_set(): return # Check abort after potentially long read
+                if abort_flag.is_set(): return
                 if audio_data.size == 0: raise ValueError("Audio file contains no samples.")
-
-                if audio_data.shape[1] > 1: # Stereo to mono
-                    mono_samples_normalized = audio_data.mean(axis=1)
-                else: # Already mono
-                    mono_samples_normalized = audio_data[:, 0]
-
-                if not np.any(mono_samples_normalized):
-                    print(f"Warning: Audio file {os.path.basename(song_path)} appears to be silent.")
-
+                if audio_data.shape[1] > 1: mono_samples_normalized = audio_data.mean(axis=1)
+                else: mono_samples_normalized = audio_data[:, 0]
+                if not np.any(mono_samples_normalized): print(f"Warning: Audio file {os.path.basename(song_path)} appears to be silent.")
             except sf.SoundFileError as sf_err:
                  error_message = f"WAVEFORM ERROR\nSoundfile Error\n({sf_err})"
-                 print(f"BG_THREAD: SoundFileError: {sf_err}")
-                 raise # Re-raise to be caught below
+                 print(f"BG_THREAD: SoundFileError: {sf_err}"); raise
             except Exception as load_err:
                  print(f"BG_THREAD: Error loading audio with soundfile: {load_err}")
-                 if "sndfile library not found" in str(load_err).lower():
-                     raise ImportError(f"libsndfile not found. Error: {load_err}")
-                 else:
-                     raise RuntimeError(f"Soundfile load failed: {load_err}")
+                 if "sndfile library not found" in str(load_err).lower(): raise ImportError(f"libsndfile not found. Error: {load_err}")
+                 else: raise RuntimeError(f"Soundfile load failed: {load_err}")
 
             if abort_flag.is_set(): return
 
-            # Downsample for oscilloscope
             if self.osc_downsample_factor > 1:
                  local_raw_data = mono_samples_normalized[::self.osc_downsample_factor]
                  effective_sample_rate = original_sample_rate / self.osc_downsample_factor
@@ -1001,19 +1112,17 @@ class MN1MusicPlayer:
 
             if abort_flag.is_set(): return
 
-            # Generate peaks for static waveform
             target_points = 500
             if len(mono_samples_normalized) > 0:
                 chunk_size = max(1, len(mono_samples_normalized) // target_points); processed_peaks = []
                 num_chunks = (len(mono_samples_normalized) + chunk_size - 1) // chunk_size
                 for i in range(num_chunks):
-                     if i % 50 == 0 and abort_flag.is_set(): return # Check abort periodically
+                     if i % 50 == 0 and abort_flag.is_set(): return
                      start = i * chunk_size; end = min((i + 1) * chunk_size, len(mono_samples_normalized))
                      chunk = mono_samples_normalized[start:end]
                      peak = np.max(np.abs(chunk)) if len(chunk) > 0 else 0.0; processed_peaks.append(peak)
                 local_peak_data = np.array(processed_peaks)
-            else:
-                local_peak_data = np.array([])
+            else: local_peak_data = np.array([])
 
             print(f"BG_THREAD: Waveform gen (soundfile) finished: {os.path.basename(song_path)} in {time.monotonic() - start_time:.2f}s")
 
@@ -1028,10 +1137,9 @@ class MN1MusicPlayer:
 
         finally:
             if not abort_flag.is_set():
-                if self.root.winfo_exists():
+                if hasattr(self, 'root') and self.root.winfo_exists():
                      self.root.after(1, self.process_waveform_result, song_path, local_peak_data, local_raw_data, effective_sample_rate, error_message)
-            else:
-                print(f"BG_THREAD: Waveform generation was aborted, result not processed.")
+            else: print(f"BG_THREAD: Waveform generation was aborted, result not processed.")
 
     def process_waveform_result(self, song_path, peak_data, raw_data, sample_rate, error_message):
         if song_path != self.current_song:
@@ -1079,7 +1187,10 @@ class MN1MusicPlayer:
             self.position_indicator_line_wave = None
             current_display_time = np.clip(self.song_time, 0.0, self.song_length if self.song_length > 0 else self.song_time)
             pos_ratio = np.clip(current_display_time / self.song_length, 0.0, 1.0) if self.song_length > 0 else 0.0
-            self.draw_waveform_position_indicator(pos_ratio); fig.canvas.draw_idle()
+            self.draw_waveform_position_indicator(pos_ratio)
+            # Use try-except for draw_idle as canvas might not be ready
+            try: fig.canvas.draw_idle()
+            except Exception: pass
         except Exception as e: print(f"Error drawing static waveform: {e}"); traceback.print_exc(); self.draw_initial_placeholder(ax, fig, spine_color, "DRAW ERROR")
 
     def draw_waveform_position_indicator(self, position_ratio):
@@ -1124,7 +1235,9 @@ class MN1MusicPlayer:
                 ax.set_ylim(-1.1, 1.1); x_osc = np.arange(len(sample_slice))
                 ax.plot(x_osc, np.clip(sample_slice, -1.0, 1.0), color=osc_col, linewidth=0.8)
                 ax.set_xlim(0, len(sample_slice) - 1 if len(sample_slice) > 1 else 1)
-                fig.canvas.draw_idle()
+                # Use try-except for draw_idle
+                try: fig.canvas.draw_idle()
+                except Exception: pass
             elif len(ax.lines) > 0:
                 self.draw_initial_placeholder(ax, fig, spine_color, "")
         except Exception as e: print(f"Error updating oscilloscope: {e}")
@@ -1149,16 +1262,20 @@ class MN1MusicPlayer:
                              if self.current_time_label.cget("text") != time_elapsed_str: self.current_time_label.configure(text=time_elapsed_str)
                          pos_ratio = np.clip(display_time_for_ui / self.song_length, 0.0, 1.0) if self.song_length > 0 else 0
                          self.draw_waveform_position_indicator(pos_ratio)
-                         if self.fig_wave and self.fig_wave.canvas: self.fig_wave.canvas.draw_idle()
+                         if self.fig_wave and self.fig_wave.canvas:
+                             try: self.fig_wave.canvas.draw_idle()
+                             except Exception: pass
                          self.update_oscilloscope()
                  else:
-                     if self.root.winfo_exists() and self.playing_state:
+                     if hasattr(self, 'root') and self.root.winfo_exists() and self.playing_state:
                         is_past_end = (self.song_length > 0 and self.song_time >= self.song_length - 0.05)
                         mixer_really_stopped = pygame.mixer.get_init() and not pygame.mixer.music.get_busy()
-                        if is_past_end or mixer_really_stopped: self.root.after(50, self.check_music_end_on_main_thread)
+                        if is_past_end or mixer_really_stopped:
+                            if hasattr(self, 'root') and self.root.winfo_exists(): # Double check root exists
+                                self.root.after(50, self.check_music_end_on_main_thread)
              except pygame.error as e: print(f"Pygame error in update: {e}"); self.has_error = True; self._update_display_title(); self.stop()
              except Exception as e:
-                 if self.root.winfo_exists(): print(f"Error during UI update: {e}")
+                 if hasattr(self, 'root') and self.root.winfo_exists(): print(f"Error during UI update: {e}")
                  self.thread_running = False
 
     def start_update_thread(self):
@@ -1173,7 +1290,7 @@ class MN1MusicPlayer:
         while self.thread_running:
             start_loop_time = time.monotonic()
             try:
-                if self.root.winfo_exists(): self.root.after(0, self.update_song_position)
+                if hasattr(self, 'root') and self.root.winfo_exists(): self.root.after(0, self.update_song_position)
                 else: self.thread_running = False; break
             except Exception as e:
                  if "application has been destroyed" in str(e).lower() or "invalid command name" in str(e).lower(): print("Update thread stopping: Tkinter object destroyed.")
@@ -1185,6 +1302,8 @@ class MN1MusicPlayer:
             if not self.playing_state or self.paused: self.thread_running = False
 
     def check_music_end_on_main_thread(self):
+        # Add check if root exists at the beginning
+        if not (hasattr(self, 'root') and self.root.winfo_exists()): return
         if not self.playing_state or self.paused or self.is_seeking: return
         try:
             is_at_end = (self.song_length > 0 and self.song_time >= self.song_length - 0.05)
@@ -1206,17 +1325,20 @@ class MN1MusicPlayer:
                      if self.song_slider and self.song_slider.winfo_exists(): self.song_slider.set(0);
                      if self.current_time_label and self.current_time_label.winfo_exists(): self.current_time_label.configure(text="00:00");
                      self.draw_waveform_position_indicator(0.0)
-                 if self.fig_wave and self.fig_wave.canvas: self.fig_wave.canvas.draw_idle()
+                 if self.fig_wave and self.fig_wave.canvas:
+                     try: self.fig_wave.canvas.draw_idle()
+                     except Exception: pass
                  if self.play_pause_button and self.play_pause_button.winfo_exists(): self.play_pause_button.configure(text="▶")
                  theme = self.themes[self.current_theme_name]; spine_color = theme['plot_spine']
                  self.draw_initial_placeholder(self.ax_osc, self.fig_osc, spine_color, "")
                  self._update_display_title()
-                 self.root.after(50, self.handle_song_end_action)
+                 if hasattr(self, 'root') and self.root.winfo_exists(): self.root.after(50, self.handle_song_end_action)
             elif not pygame.mixer.get_init(): print("Mixer stopped unexpectedly."); self.stop()
         except pygame.error as e: print(f"Pygame error during end check: {e}"); self.has_error=True; self._update_display_title(); self.stop()
         except Exception as e: print(f"Error during end check: {e}"); traceback.print_exc(); self.has_error=True; self._update_display_title(); self.stop()
 
     def handle_song_end_action(self):
+        if not (hasattr(self, 'root') and self.root.winfo_exists()): return # Check root exists
         theme = self.themes[self.current_theme_name]; spine_color = theme['plot_spine']
         if self.loop_state == 2:
              print("Looping current song.")
@@ -1235,7 +1357,9 @@ class MN1MusicPlayer:
                  if self.song_slider and self.song_slider.winfo_exists(): self.song_slider.set(0);
                  if self.current_time_label and self.current_time_label.winfo_exists(): self.current_time_label.configure(text="00:00");
                  self.draw_waveform_position_indicator(0)
-                 if self.fig_wave and self.fig_wave.canvas: self.fig_wave.canvas.draw_idle()
+                 if self.fig_wave and self.fig_wave.canvas:
+                     try: self.fig_wave.canvas.draw_idle()
+                     except Exception: pass
                  self.draw_initial_placeholder(self.ax_osc, self.fig_osc, spine_color,"")
                  self._update_display_title(base_title=last_song_name)
                  if self.play_pause_button and self.play_pause_button.winfo_exists(): self.play_pause_button.configure(text="▶")
@@ -1262,7 +1386,7 @@ class MN1MusicPlayer:
                       self.is_generating_waveform = False
                       if self.current_song and "[GENERATING...]" in self.song_title_var.get():
                           try:
-                            if self.root.winfo_exists(): self.root.after(0, self._update_display_title)
+                            if hasattr(self, 'root') and self.root.winfo_exists(): self.root.after(0, self._update_display_title)
                           except Exception: pass
 
     def on_closing(self):
@@ -1282,12 +1406,11 @@ class MN1MusicPlayer:
             print("Waiting for update thread to join...")
             self.update_thread.join(timeout=0.3)
             if self.update_thread.is_alive(): print("Update thread did not join cleanly.")
-        if self.root:
+        if hasattr(self, 'root') and self.root:
             try:
-                self.root.destroy()
-                print("Application closed.")
-            except Exception as e:
-                print(f"Error destroying root window: {e}")
+                if self.root.winfo_exists(): self.root.destroy(); print("Application closed.")
+                else: print("Root window already destroyed.")
+            except Exception as e: print(f"Error destroying root window: {e}")
 
 # --- Main Execution Block ---
 if __name__ == "__main__":
@@ -1302,7 +1425,7 @@ if __name__ == "__main__":
              except Exception as dpi_error: print(f"Could not set DPI awareness: {dpi_error}")
 
         root = ctk.CTk()
-        root.minsize(600, 450)
+        # REMOVED minsize constraint
         player = MN1MusicPlayer (root)
         root.mainloop()
     except Exception as main_error:
