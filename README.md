@@ -84,7 +84,7 @@ We appreciate contributions that enhance the simplicity, functionality, and soun
 
 ## License
 
-This project is licensed under the **[Your License Name Here - e.g., MIT License, GPL v3]**. See the `LICENSE` file for details. *(Remember to add a LICENSE file to your repository!)*
+This project is licensed under the **GNU**. See the `LICENSE` file for details.
 
 ---
 
