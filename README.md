@@ -54,7 +54,7 @@ Ready to experience minimalist music? Here's how to get the MN-1 running:
 
 1.  **Run the Player:**
     ```bash
-    python MN-1.pyw
+    python MN-1.py
     ```
     *(On Windows, you can also use the provided `.exe` file found in the Bonus link below).*
 
