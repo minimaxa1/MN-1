@@ -1,4 +1,4 @@
-![MN-1-Cyber](https://github.com/user-attachments/assets/6680859d-af07-498a-9b34-1f1e50e467dd)# MN-1: Engineered for Listening, Built in Python
+# MN-1: Engineered for Listening, Built in Python
 
 ![MN-1](https://github.com/user-attachments/assets/53459aa0-4137-4761-9317-9c9332fbd12a)
 
@@ -19,6 +19,8 @@ The MN-1 strips away the unnecessary complexities of modern music players, offer
 *   **Real-time Waveform & Oscilloscope Display:** Visualize your music as it plays with captivating and informative waveform and oscilloscope displays. Go beyond just hearing – see the dynamics of your tracks.
 *   **Focus on Sound Quality:** The MN-1 is designed to deliver your choice of music formats (MP3, FLAC, WAV) with clarity and fidelity, letting the music speak for itself.
 *   **Open Source Spirit:** The MN-1 is open source and welcomes contributions from the community. Built by music lovers, for music lovers.
+
+![MN-1-White](https://github.com/user-attachments/assets/e3a59343-6b17-46df-a911-65f3d29c3fad)
 
 ## Getting Started
 
