@@ -30,7 +30,7 @@ Ready to experience minimalist music? Here's how to get the MN-1 running:
 ### Prerequisites
 
 *   **Python 3.x:** Ensure you have Python 3 (preferably 3.8 or later) installed on your system. You can download it from [python.org](https://www.python.org/).
-*   **FFmpeg:** Required by the `pydub` library for loading various audio formats. Download and install it from [ffmpeg.org](https://ffmpeg.org/) and ensure it's added to your system's PATH.
+*   **FFmpeg:** Required by the `soundfile` library for loading various audio formats. Download and install it from [ffmpeg.org](https://ffmpeg.org/) and ensure it's added to your system's PATH.
 
 ### Installation
 
@@ -47,7 +47,7 @@ Ready to experience minimalist music? Here's how to get the MN-1 running:
     ```
     Alternatively, you can install the core dependencies manually (though versions might differ):
     ```bash
-    pip install customtkinter pygame Pillow mutagen numpy pydub matplotlib
+    pip install customtkinter pygame Pillow mutagen numpy soundfile matplotlib
     ```
 
 ### Usage
@@ -66,7 +66,7 @@ Ready to experience minimalist music? Here's how to get the MN-1 running:
 *   **Language:** Python 3
 *   **GUI:** CustomTkinter
 *   **Audio Backend:** Pygame Mixer
-*   **Audio Processing:** Pydub, Mutagen, NumPy
+*   **Audio Processing:** Soundfile, Mutagen, NumPy
 *   **Visualization:** Matplotlib
 *   **Platform:** Cross-platform (tested on Windows, should run on macOS and Linux with dependencies installed).
 
