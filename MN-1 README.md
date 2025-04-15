@@ -37,7 +37,7 @@ pygame
 Pillow
 mutagen
 numpy
-pydub
+soundfile
 ffmpeg
 matplotlib
 
