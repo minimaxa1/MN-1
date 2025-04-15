@@ -84,7 +84,7 @@ We appreciate contributions that enhance the simplicity, functionality, and soun
 
 ## License
 
-This project is licensed under the **GNU**. See the `LICENSE` file for details.
+This project is licensed under the **GPL**. See the `LICENSE` file for details.
 
 ---
 
