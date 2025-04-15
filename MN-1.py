@@ -1,3 +1,5 @@
+# --- START OF FINAL MN-1.py ---
+
 import customtkinter as ctk
 from tkinter import filedialog
 import pygame
@@ -214,9 +216,12 @@ class MN1MusicPlayer:
         try: pygame.mixer.music.set_volume(self.previous_volume)
         except Exception as e: print(f"Warning: Could not set initial volume: {e}")
 
+        # --- Fonts ---
         self.title_font = ("SF Mono", 16, "bold")
         self.normal_font = ("SF Mono", 11)
         self.button_font = ("SF Mono", 13, "bold")
+        self.play_pause_button_font = ("SF Mono", 26, "bold") # Larger font for Play/Pause icon
+        # --- End Fonts ---
 
         self.fig_wave, self.ax_wave = plt.subplots(figsize=(5, 1.5))
         self.mpl_canvas_widget_wave = None
@@ -235,6 +240,10 @@ class MN1MusicPlayer:
         self.update_thread = None; self.thread_running = False
         self.song_title_var = ctk.StringVar(value="NO SONG LOADED")
 
+        # --- UI Elements (declare button here) ---
+        self.play_pause_button = None
+
+        # --- Create UI ---
         self.create_frames()
         self.create_player_area()
         self.create_waveform_display()
@@ -265,7 +274,8 @@ class MN1MusicPlayer:
         try:
             fig.subplots_adjust(left=0.01, right=0.99, top=0.99, bottom=0.01)
         except Exception as e:
-             print(f"Warning: subplots_adjust failed: {e}")
+             # print(f"Warning: subplots_adjust failed: {e}") # Be less verbose
+             pass
 
     def create_frames(self):
         self.player_frame = ctk.CTkFrame(self.root, corner_radius=0)
@@ -337,12 +347,32 @@ class MN1MusicPlayer:
     def create_controls(self):
         self.buttons_frame = ctk.CTkFrame(self.controls_frame, corner_radius=0)
         self.buttons_frame.pack(pady=(5,0), anchor="center")
-        button_kwargs = {"font": self.button_font, "border_width": 0, "corner_radius": 0, "width": 35, "height": 28}
-        self.prev_button = ctk.CTkButton(self.buttons_frame, text="◄◄", command=self.previous_song, **button_kwargs); self.prev_button.grid(row=0, column=0, padx=4)
-        self.play_button = ctk.CTkButton(self.buttons_frame, text="▶", command=self.play, **button_kwargs); self.play_button.grid(row=0, column=1, padx=4)
-        self.pause_button = ctk.CTkButton(self.buttons_frame, text="II", command=self.pause, **button_kwargs); self.pause_button.grid(row=0, column=2, padx=4)
-        self.next_button = ctk.CTkButton(self.buttons_frame, text="►►", command=self.next_song, **button_kwargs); self.next_button.grid(row=0, column=3, padx=4)
 
+        # Button size (100% larger than original 35x28)
+        # Font here is the *default* for all buttons initially
+        button_kwargs = {"font": self.button_font, # Use standard button font for initial creation
+                         "border_width": 0,
+                         "corner_radius": 0,
+                         "width": 70,  # Doubled width
+                         "height": 56} # Doubled height
+
+        # --- Buttons (Using updated kwargs) ---
+        self.prev_button = ctk.CTkButton(self.buttons_frame, text="◄◄", command=self.previous_song, **button_kwargs)
+        self.prev_button.grid(row=0, column=0, padx=4) # Column 0
+
+        self.play_pause_button = ctk.CTkButton(self.buttons_frame, text="▶", command=self.toggle_play_pause, **button_kwargs)
+        self.play_pause_button.grid(row=0, column=1, padx=4) # Column 1
+
+        self.next_button = ctk.CTkButton(self.buttons_frame, text="►►", command=self.next_song, **button_kwargs)
+        self.next_button.grid(row=0, column=2, padx=4) # Column 2
+        # --- End Buttons ---
+
+        # --- Apply larger font specifically to Play/Pause button ---
+        if self.play_pause_button and self.play_pause_button.winfo_exists():
+            self.play_pause_button.configure(font=self.play_pause_button_font) # Override font
+        # --- End Font Override ---
+
+        # --- Rest of the controls ---
         self.extra_frame = ctk.CTkFrame(self.controls_frame, corner_radius=0)
         self.extra_frame.pack(pady=(2,5), anchor="center")
         extra_button_kwargs = {"font": self.normal_font, "border_width": 0, "corner_radius": 0, "width": 65, "height": 25}
@@ -424,11 +454,21 @@ class MN1MusicPlayer:
                      label.configure(fg_color=bg_col, text_color=text_col)
 
             # Buttons (Main Playback) - Use bg/hover from theme levels
-            main_button_fg = bg_col if self.current_theme_name != "light" else text_col # Special case for light theme buttons
+            # Determine button base color (often matches background, except light theme)
+            main_button_fg = bg_col if self.current_theme_name != "light" else text_col
+            # Text color usually contrasts with background
             main_button_text = text_col if self.current_theme_name != "light" else bg_col
-            for btn in [self.prev_button, self.play_button, self.pause_button, self.next_button]:
+
+            # Updated list to include the new play_pause_button
+            for btn in [self.prev_button, self.play_pause_button, self.next_button]:
                  if btn and btn.winfo_exists():
                      btn.configure(fg_color=main_button_fg, text_color=main_button_text, hover_color=hover_col)
+                     # Re-apply correct font (larger one for play/pause)
+                     if btn is self.play_pause_button:
+                         btn.configure(font=self.play_pause_button_font)
+                     else:
+                         btn.configure(font=self.button_font)
+
 
             # Buttons (Extra Controls & Playlist) - Use bg/hover from theme levels
             extra_button_fg = main_button_fg # Often same as main buttons
@@ -439,9 +479,9 @@ class MN1MusicPlayer:
             for btn in extra_buttons:
                  if btn and btn.winfo_exists():
                      btn.configure(fg_color=extra_button_fg, hover_color=hover_col)
-                     # Special text color for theme toggle
+                     # Special text color for theme toggle (use primary accent)
                      if btn is self.theme_toggle_button:
-                         btn.configure(text_color=accent_col) # Use primary accent for theme toggle text
+                         btn.configure(text_color=accent_col)
                      else:
                          btn.configure(text_color=extra_button_text)
 
@@ -463,16 +503,16 @@ class MN1MusicPlayer:
                                                     scrollbar_button_hover_color=list_scrollbar_hover_col)
 
             # State-Dependent Colors
-            mute_color = accent_col if self.muted else text_col
+            mute_color = accent_col if self.muted else text_col # Muted text uses accent color
             mute_text = "MUTED" if self.muted else "VOL"
             if self.volume_button and self.volume_button.winfo_exists():
                  self.volume_button.configure(text_color=mute_color, text=mute_text)
 
-            mix_color = accent_col if self.shuffle_state else text_col
+            mix_color = accent_col if self.shuffle_state else text_col # Active mix uses accent color
             if self.mix_button and self.mix_button.winfo_exists():
                  self.mix_button.configure(text_color=mix_color)
 
-            loop_color = accent_col if self.loop_state > 0 else text_col
+            loop_color = accent_col if self.loop_state > 0 else text_col # Active loop uses accent color
             loop_text = "LOOP";
             if self.loop_state == 1: loop_text = "LOOP ALL"
             elif self.loop_state == 2: loop_text = "LOOP ONE"
@@ -590,7 +630,7 @@ class MN1MusicPlayer:
              self.abort_waveform_generation()
              self.current_song_index = index
              self.select_song(index)
-             self.play_music()
+             self.play_music() # Use play_music to start from beginning
         else: print(f"Warning: play_selected_song_by_index index {index} out of range.");
 
     def play_selected_song(self, event=None):
@@ -632,6 +672,9 @@ class MN1MusicPlayer:
         if is_current_song_removed:
             self.stop(); self.current_song = ""; self.has_error = False; self.is_loading = False; self.is_generating_waveform = False;
             self._update_display_title(base_title="NO SONG LOADED")
+            # Reset play button text
+            if self.play_pause_button and self.play_pause_button.winfo_exists():
+                self.play_pause_button.configure(text="▶")
             theme = self.themes[self.current_theme_name]; spine_color = theme['plot_spine']
             self.draw_initial_placeholder(self.ax_wave, self.fig_wave, spine_color, "TRACK REMOVED")
             self.draw_initial_placeholder(self.ax_osc, self.fig_osc, spine_color, "")
@@ -644,6 +687,9 @@ class MN1MusicPlayer:
             if not is_current_song_removed:
                  self.current_song = ""; self.has_error = False; self.is_loading = False; self.is_generating_waveform = False;
                  self._update_display_title(base_title="TRACKLIST EMPTY")
+                 # Reset play button text
+                 if self.play_pause_button and self.play_pause_button.winfo_exists():
+                     self.play_pause_button.configure(text="▶")
                  theme = self.themes[self.current_theme_name]; spine_color = theme['plot_spine']
                  self.draw_initial_placeholder(self.ax_wave, self.fig_wave, spine_color, "TRACKLIST EMPTY")
                  self.draw_initial_placeholder(self.ax_osc, self.fig_osc, spine_color, "")
@@ -666,6 +712,9 @@ class MN1MusicPlayer:
         self.playlist_entries.clear(); self.songs_list.clear(); self.current_song_index = 0; self.current_song = ""
         self.has_error = False; self.is_loading = False; self.is_generating_waveform = False;
         self._update_display_title(base_title="TRACKLIST CLEARED")
+        # Reset play button text
+        if self.play_pause_button and self.play_pause_button.winfo_exists():
+            self.play_pause_button.configure(text="▶")
         self.waveform_peak_data = None; self.raw_sample_data = None; self.sample_rate = None
         theme = self.themes[self.current_theme_name]; spine_color = theme['plot_spine']
         self.draw_initial_placeholder(self.ax_wave, self.fig_wave, spine_color, "TRACKLIST CLEARED")
@@ -675,121 +724,204 @@ class MN1MusicPlayer:
         if self.song_slider and self.song_slider.winfo_exists(): self.song_slider.set(0); self.song_slider.configure(to=100)
         self.song_length = 0; self._update_display_title(base_title="TRACKLIST EMPTY")
 
-    def play(self):
-        if not self.songs_list: self._update_display_title(base_title="TRACKLIST EMPTY"); return
-        self.has_error = False; theme = self.themes[self.current_theme_name]
-        active_button_color = theme["L4_hover_bg"] # Use L4 for hover/active flash
+    def toggle_play_pause(self):
+        """Handles the combined Play/Pause button action."""
+        if not self.songs_list:
+            self._update_display_title(base_title="TRACKLIST EMPTY")
+            if self.play_pause_button and self.play_pause_button.winfo_exists():
+                self.play_pause_button.configure(text="▶")
+            return
+
+        self.has_error = False
+        theme = self.themes[self.current_theme_name]
+        active_button_color = theme["L4_hover_bg"]
         default_button_color = theme["L1_bg"] if self.current_theme_name != "light" else theme["L6_text_light"]
         spine_color = theme['plot_spine']
 
-        if self.paused: # Unpause
-             if self.play_button and self.play_button.winfo_exists():
-                 self.play_button.configure(fg_color=active_button_color); self.root.after(100, lambda: self.play_button.configure(fg_color=default_button_color) if self.play_button and self.play_button.winfo_exists() else None)
+        # --- Visual Feedback ---
+        if self.play_pause_button and self.play_pause_button.winfo_exists():
+            self.play_pause_button.configure(fg_color=active_button_color)
+            self.root.after(100, lambda: self.play_pause_button.configure(fg_color=default_button_color) if self.play_pause_button and self.play_pause_button.winfo_exists() else None)
+
+        # --- Logic ---
+        if self.playing_state: # --- PAUSE ---
+            if not self.paused: # Ensure we only pause if actually playing
+                try:
+                    current_pos_ms = 0
+                    if pygame.mixer.get_init() and pygame.mixer.music.get_busy():
+                        current_pos_ms = pygame.mixer.music.get_pos()
+                        if current_pos_ms != -1:
+                            time_since_last_play_sec = current_pos_ms / 1000.0
+                            # Update stopped_position based on current play time + previous base time
+                            self.stopped_position = self.stopped_position + time_since_last_play_sec
+                            self.song_time = self.stopped_position # Update current time as well
+                    pygame.mixer.music.pause()
+                    self.paused = True; self.playing_state = False
+                    self.thread_running = False # Stop updates
+                    if self.play_pause_button and self.play_pause_button.winfo_exists():
+                        self.play_pause_button.configure(text="▶") # Show Play symbol
+                    self._update_display_title()
+                    print(f"Playback Paused at {self.stopped_position:.2f}s (Raw mixer pos: {current_pos_ms}ms)")
+                except pygame.error as e:
+                    print(f"Pygame error during pause: {e}")
+                    self.has_error = True; self._update_display_title()
+
+        elif self.paused: # --- UNPAUSE ---
              try:
-                 pygame.mixer.music.unpause(); self.paused = False; self.playing_state = True
-                 self._update_display_title(); self.start_update_thread(); print(f"Resumed playback from {self.stopped_position:.2f}s")
-             except pygame.error as e: print(f"Pygame error during unpause: {e}")
-        elif not self.playing_state: # Play new or resume stopped
+                 pygame.mixer.music.unpause()
+                 self.paused = False; self.playing_state = True
+                 # stopped_position remains the same, playback continues from there
+                 if self.play_pause_button and self.play_pause_button.winfo_exists():
+                     self.play_pause_button.configure(text="II") # Show Pause symbol
+                 self._update_display_title(); self.start_update_thread()
+                 print(f"Resumed playback from {self.stopped_position:.2f}s")
+             except pygame.error as e:
+                 print(f"Pygame error during unpause: {e}")
+                 self.has_error = True; self._update_display_title()
+
+        else: # --- PLAY (From stopped state or new song) ---
             song_to_play_index = -1; selected_idx = -1; is_resuming = False
+            # Find selected song in list
             for i, entry in enumerate(self.playlist_entries):
-                 if entry and entry.get("frame") and entry["frame"].winfo_exists() and entry.get("selected"): selected_idx = i; break
+                 if entry and entry.get("frame") and entry["frame"].winfo_exists() and entry.get("selected"):
+                    selected_idx = i; break
+
+            # Determine which song and if resuming
             if selected_idx != -1 and 0 <= selected_idx < len(self.songs_list):
                 song_to_play_index = selected_idx
+                # Check if we are resuming the *same* selected song
                 is_resuming = (song_to_play_index == self.current_song_index and self.stopped_position > 0 and self.current_song == self.songs_list[song_to_play_index])
             elif self.current_song and self.stopped_position > 0 and 0 <= self.current_song_index < len(self.songs_list) and self.songs_list[self.current_song_index] == self.current_song:
+                # If no selection, resume the previously stopped song if possible
                 song_to_play_index = self.current_song_index; is_resuming = True
             elif self.songs_list:
+                 # Fallback: Use selected index if valid, else current index, else first song
                  current_selected_index = -1
                  for i, entry in enumerate(self.playlist_entries):
-                     if entry and entry.get("frame") and entry["frame"].winfo_exists() and entry.get("selected"): current_selected_index = i; break
-                 if 0 <= current_selected_index < len(self.songs_list): song_to_play_index = current_selected_index
-                 elif 0 <= self.current_song_index < len(self.songs_list): song_to_play_index = self.current_song_index
-                 else: song_to_play_index = 0
+                     if entry and entry.get("frame") and entry["frame"].winfo_exists() and entry.get("selected"):
+                         current_selected_index = i; break
+                 if 0 <= current_selected_index < len(self.songs_list):
+                      song_to_play_index = current_selected_index
+                 elif 0 <= self.current_song_index < len(self.songs_list):
+                     song_to_play_index = self.current_song_index
+                 else:
+                     song_to_play_index = 0
+                 # Check if this determined song is the one we stopped
                  is_resuming = (song_to_play_index == self.current_song_index and self.stopped_position > 0 and self.current_song == self.songs_list[song_to_play_index])
+
             if song_to_play_index != -1:
                 new_song_path = self.songs_list[song_to_play_index]
-                song_changed = (new_song_path != self.current_song) or not is_resuming
-                self.current_song_index = song_to_play_index; self.current_song = new_song_path
-                self.select_song(self.current_song_index)
+                song_changed = (new_song_path != self.current_song)
+
+                self.current_song_index = song_to_play_index
+                self.current_song = new_song_path
+                self.select_song(self.current_song_index) # Highlight song
+
                 try:
-                    if self.play_button and self.play_button.winfo_exists():
-                        self.play_button.configure(fg_color=active_button_color); self.root.after(100, lambda: self.play_button.configure(fg_color=default_button_color) if self.play_button and self.play_button.winfo_exists() else None)
                     self.is_loading = True; self._update_display_title()
-                    if song_changed:
-                         self.abort_waveform_generation(); self.update_song_info()
+
+                    if song_changed or not is_resuming: # Load if song changed OR not resuming
+                         self.abort_waveform_generation()
+                         self.update_song_info() # Get length etc.
                          self.draw_initial_placeholder(self.ax_wave, self.fig_wave, spine_color, "LOADING...")
                          self.draw_initial_placeholder(self.ax_osc, self.fig_osc, spine_color, "")
                          pygame.mixer.music.load(self.current_song)
-                         start_pos = 0.0; self.stopped_position = 0.0; self.song_time = 0.0
-                    else: start_pos = self.stopped_position # Keep existing stopped_position
-                    pygame.mixer.music.play(start=start_pos); print(f"Playback started. Start pos: {start_pos:.2f}s. Base time: {self.stopped_position:.2f}s")
+                         start_pos = 0.0
+                         self.stopped_position = 0.0 # Reset base time for new song/play
+                         self.song_time = 0.0        # Reset current time
+                         print(f"Starting new playback: {os.path.basename(self.current_song)}")
+                    else: # Resuming the same song
+                         start_pos = self.stopped_position # Use the recorded pause time
+                         print(f"Resuming stopped playback: {os.path.basename(self.current_song)} at {start_pos:.2f}s")
+                         # No need to reload, stopped_position is already set
+
+                    # Play from the determined start position
+                    pygame.mixer.music.play(start=start_pos)
+
                     self.playing_state = True; self.paused = False; self.is_loading = False
+                    if self.play_pause_button and self.play_pause_button.winfo_exists():
+                        self.play_pause_button.configure(text="II") # Show Pause symbol
                     self._update_display_title(); self.start_update_thread()
-                    if song_changed: self.trigger_waveform_generation()
-                except pygame.error as e: print(f"Pygame Error: {e}"); self.has_error = True; self.is_loading = False; self._update_display_title(base_title=f"{os.path.basename(self.current_song)}"); self.playing_state = False; self.paused = False; self.current_song = ""
-                except Exception as e: print(f"Error: {e}"); traceback.print_exc(); self.has_error = True; self.is_loading = False; self._update_display_title(base_title=f"{os.path.basename(self.current_song)}"); self.playing_state = False; self.paused = False; self.current_song = ""
-            else: self._update_display_title(base_title="TRACKLIST EMPTY?")
+                    if song_changed or not is_resuming: # Generate waveform only if new
+                        self.trigger_waveform_generation()
+
+                except pygame.error as e:
+                    print(f"Pygame Error: {e}"); self.has_error = True; self.is_loading = False; self._update_display_title(base_title=f"{os.path.basename(self.current_song)}"); self.playing_state = False; self.paused = False; self.current_song = ""
+                    if self.play_pause_button and self.play_pause_button.winfo_exists(): self.play_pause_button.configure(text="▶") # Reset button
+                except Exception as e:
+                    print(f"Error: {e}"); traceback.print_exc(); self.has_error = True; self.is_loading = False; self._update_display_title(base_title=f"{os.path.basename(self.current_song)}"); self.playing_state = False; self.paused = False; self.current_song = ""
+                    if self.play_pause_button and self.play_pause_button.winfo_exists(): self.play_pause_button.configure(text="▶") # Reset button
+            else:
+                 self._update_display_title(base_title="TRACKLIST EMPTY?")
+                 if self.play_pause_button and self.play_pause_button.winfo_exists(): self.play_pause_button.configure(text="▶")
+
 
     def play_music(self):
+        """Core function to load and play a song from the beginning. Called internally."""
         if not self.songs_list or not (0 <= self.current_song_index < len(self.songs_list)):
-            self._update_display_title(base_title="INVALID SELECTION"); return
+            self._update_display_title(base_title="INVALID SELECTION")
+            if self.play_pause_button and self.play_pause_button.winfo_exists():
+                self.play_pause_button.configure(text="▶")
+            return
         self.has_error = False; self.current_song = self.songs_list[self.current_song_index]
-        self.stopped_position = 0.0; self.song_time = 0.0
+        self.stopped_position = 0.0; self.song_time = 0.0 # Always start from 0
         theme = self.themes[self.current_theme_name]; spine_color = theme['plot_spine']
         try:
             self.abort_waveform_generation(); print(f"play_music: Loading {os.path.basename(self.current_song)}")
             self.is_loading = True; self._update_display_title()
             pygame.mixer.music.stop(); pygame.mixer.music.load(self.current_song)
-            self.update_song_info(); pygame.mixer.music.play()
+            self.update_song_info(); pygame.mixer.music.play() # Play from start
             self.playing_state = True; self.paused = False; self.is_loading = False
+            # Update button text to Pause
+            if self.play_pause_button and self.play_pause_button.winfo_exists():
+                 self.play_pause_button.configure(text="II")
             self.select_song(self.current_song_index); self._update_display_title()
             if self.song_slider and self.song_slider.winfo_exists(): self.song_slider.set(0)
             if self.current_time_label and self.current_time_label.winfo_exists(): self.current_time_label.configure(text="00:00")
             self.draw_initial_placeholder(self.ax_wave, self.fig_wave, spine_color,"GENERATING...")
             self.draw_initial_placeholder(self.ax_osc, self.fig_osc, spine_color,"")
             self.trigger_waveform_generation(); self.start_update_thread()
-        except pygame.error as e: print(f"Pygame Error: {e}"); self.has_error = True; self.is_loading = False; self._update_display_title(base_title=f"{os.path.basename(self.current_song)}"); self.playing_state = False; self.paused = False; self.current_song = ""; self.draw_initial_placeholder(self.ax_wave, self.fig_wave, spine_color,"LOAD ERROR"); self.draw_initial_placeholder(self.ax_osc, self.fig_osc, spine_color,"")
-        except Exception as e: print(f"Error: {e}"); traceback.print_exc(); self.has_error = True; self.is_loading = False; self._update_display_title(base_title=f"{os.path.basename(self.current_song)}"); self.playing_state = False; self.paused = False; self.current_song = ""; self.draw_initial_placeholder(self.ax_wave, self.fig_wave, spine_color,"ERROR"); self.draw_initial_placeholder(self.ax_osc, self.fig_osc, spine_color,"")
+        except pygame.error as e:
+             print(f"Pygame Error: {e}"); self.has_error = True; self.is_loading = False; self._update_display_title(base_title=f"{os.path.basename(self.current_song)}"); self.playing_state = False; self.paused = False; self.current_song = "";
+             if self.play_pause_button and self.play_pause_button.winfo_exists(): self.play_pause_button.configure(text="▶"); # Reset button
+             self.draw_initial_placeholder(self.ax_wave, self.fig_wave, spine_color,"LOAD ERROR"); self.draw_initial_placeholder(self.ax_osc, self.fig_osc, spine_color,"")
+        except Exception as e:
+             print(f"Error: {e}"); traceback.print_exc(); self.has_error = True; self.is_loading = False; self._update_display_title(base_title=f"{os.path.basename(self.current_song)}"); self.playing_state = False; self.paused = False; self.current_song = "";
+             if self.play_pause_button and self.play_pause_button.winfo_exists(): self.play_pause_button.configure(text="▶"); # Reset button
+             self.draw_initial_placeholder(self.ax_wave, self.fig_wave, spine_color,"ERROR"); self.draw_initial_placeholder(self.ax_osc, self.fig_osc, spine_color,"")
 
-    def pause(self):
-        theme = self.themes[self.current_theme_name]
-        active_button_color = theme["L4_hover_bg"]
-        default_button_color = theme["L1_bg"] if self.current_theme_name != "light" else theme["L6_text_light"]
-        if self.playing_state and not self.paused:
-             if self.pause_button and self.pause_button.winfo_exists():
-                 self.pause_button.configure(fg_color=active_button_color); self.root.after(100, lambda: self.pause_button.configure(fg_color=default_button_color) if self.pause_button and self.pause_button.winfo_exists() else None)
-             try:
-                 if pygame.mixer.get_init() and pygame.mixer.music.get_busy():
-                     current_pos_ms = pygame.mixer.music.get_pos()
-                     if current_pos_ms != -1:
-                          time_since_last_play_sec = current_pos_ms / 1000.0
-                          self.stopped_position = self.stopped_position + time_since_last_play_sec
-                          self.song_time = self.stopped_position
-                 pygame.mixer.music.pause()
-                 self.paused = True; self.playing_state = False
-                 self._update_display_title(); self.thread_running = False
-                 print(f"Playback Paused at {self.stopped_position:.2f}s")
-             except pygame.error as e: print(f"Pygame error during pause: {e}")
-        elif self.paused: self.play()
 
     def stop(self):
         if self.playing_state or self.paused:
             final_pos = 0.0
             try:
-                if self.paused: final_pos = self.stopped_position
+                # If paused, the correct position is already stored in stopped_position
+                if self.paused:
+                    final_pos = self.stopped_position
+                # If playing, calculate current absolute time
                 elif self.playing_state and pygame.mixer.get_init() and pygame.mixer.music.get_busy():
                     current_pos_ms = pygame.mixer.music.get_pos()
-                    if current_pos_ms != -1: final_pos = self.stopped_position + (current_pos_ms / 1000.0)
-                    else: final_pos = self.song_time
-                else: final_pos = self.song_time
+                    if current_pos_ms != -1:
+                        final_pos = self.stopped_position + (current_pos_ms / 1000.0)
+                    else: # Fallback if get_pos fails while playing
+                        final_pos = self.song_time
+                else: # Fallback if state is inconsistent
+                    final_pos = self.song_time
+
                 print(f"Stop called, final calculated pos: {final_pos:.2f}s")
                 pygame.mixer.music.stop()
             except pygame.error as e: print(f"Pygame error during stop: {e}")
             finally:
                 was_playing_or_paused = self.playing_state or self.paused
                 self.playing_state = False; self.paused = False
+                # Store the final calculated position as the new stopped_position
                 self.stopped_position = np.clip(final_pos, 0.0, self.song_length if self.song_length > 0 else final_pos + 1.0)
-                self.song_time = self.stopped_position; self._update_display_title(); self.thread_running = False
+                self.song_time = self.stopped_position # Sync song_time
+                self._update_display_title(); self.thread_running = False
+                # Update button text to Play
+                if self.play_pause_button and self.play_pause_button.winfo_exists():
+                    self.play_pause_button.configure(text="▶")
+
                 if was_playing_or_paused:
                     slider_val = self.stopped_position
                     if self.song_slider and self.song_slider.winfo_exists(): self.song_slider.set(slider_val)
@@ -801,7 +933,13 @@ class MN1MusicPlayer:
                     if self.fig_wave and self.fig_wave.canvas: self.fig_wave.canvas.draw_idle()
                     self.draw_initial_placeholder(self.ax_osc, self.fig_osc, spine_color,"")
                     print(f"Stopped. Recorded pos: {self.stopped_position:.2f}s")
-        else: self.thread_running = False; self._update_display_title()
+        else: # Already stopped
+            self.thread_running = False
+            self._update_display_title()
+            # Ensure button shows Play if already stopped
+            if self.play_pause_button and self.play_pause_button.winfo_exists():
+                 self.play_pause_button.configure(text="▶")
+
 
     def previous_song(self):
         if not self.songs_list: self._update_display_title(base_title="TRACKLIST EMPTY"); return
@@ -814,9 +952,10 @@ class MN1MusicPlayer:
         if not self.songs_list: self._update_display_title(base_title="TRACKLIST EMPTY"); return
         original_index = self.current_song_index
         if not auto_advance: self.stop()
-        else:
+        else: # Auto-advance just resets state, doesn't call stop()
             self.playing_state = False; self.paused = False; self.thread_running = False
             self.abort_waveform_generation(); self.stopped_position = 0.0; self.song_time = 0.0
+            # Let play_music set the button text
             print("Auto-advancing to next song.")
         if len(self.songs_list) > 0:
              self.current_song_index = (original_index + 1) % len(self.songs_list)
@@ -931,31 +1070,45 @@ class MN1MusicPlayer:
             self.is_seeking = True
             try:
                 self.has_error = False
+                # Prevent seeking exactly to the end, pygame might have issues
                 seek_pos = np.clip(position_seconds, 0.0, self.song_length - 0.1 if self.song_length > 0.1 else 0.0)
                 print(f"Seeking to: {seek_pos:.2f}s (requested: {position_seconds:.2f}s)")
 
-                self.stopped_position = seek_pos; self.song_time = seek_pos # Update time state
+                self.stopped_position = seek_pos # THIS IS THE CRUCIAL UPDATE: Base time becomes seek target
+                self.song_time = seek_pos       # Current time also becomes seek target
+
                 if self.song_slider and self.song_slider.winfo_exists(): self.song_slider.set(seek_pos)
                 if self.current_time_label and self.current_time_label.winfo_exists():
                     mins, secs = divmod(int(seek_pos), 60); self.current_time_label.configure(text=f"{mins:02d}:{secs:02d}")
                 pos_ratio = np.clip(seek_pos / self.song_length, 0.0, 1.0) if self.song_length > 0 else 0.0
                 self.draw_waveform_position_indicator(pos_ratio)
                 if self.fig_wave and self.fig_wave.canvas: self.fig_wave.canvas.draw_idle()
-                if self.raw_sample_data is not None: self.update_oscilloscope()
+                if self.raw_sample_data is not None: self.update_oscilloscope() # Update scope immediately
 
                 try:
                     if self.playing_state or self.paused:
                         was_paused = self.paused
+                        # Play always restarts the timer from 0, seek is handled by start=
                         pygame.mixer.music.play(start=seek_pos)
-                        if was_paused: pygame.mixer.music.pause(); self.playing_state = False; self.paused = True
-                        else: self.playing_state = True; self.paused = False; self.start_update_thread()
+                        if was_paused:
+                            pygame.mixer.music.pause()
+                            self.playing_state = False; self.paused = True
+                            if self.play_pause_button and self.play_pause_button.winfo_exists(): self.play_pause_button.configure(text="▶") # Show Play
+                        else:
+                            self.playing_state = True; self.paused = False
+                            if self.play_pause_button and self.play_pause_button.winfo_exists(): self.play_pause_button.configure(text="II") # Show Pause
+                            self.start_update_thread()
                         self._update_display_title()
-                    else: self._update_display_title(); print(f"Player stopped, updated next start pos to {seek_pos:.2f}s")
+                    else: # Player was completely stopped
+                         self._update_display_title()
+                         if self.play_pause_button and self.play_pause_button.winfo_exists(): self.play_pause_button.configure(text="▶") # Show Play
+                         print(f"Player stopped, updated next start pos to {seek_pos:.2f}s")
                 except pygame.error as e: print(f"Pygame error on seek: {e}"); self.has_error = True; self._update_display_title()
                 except Exception as e: print(f"General error on seek: {e}"); traceback.print_exc(); self.has_error = True; self._update_display_title()
             finally:
                 self.root.after(50, self._clear_seeking_flag) # Delayed clearing
         else: print("Seek ignored: No song, zero length, or mixer not initialized.")
+
 
     def _clear_seeking_flag(self):
         self.is_seeking = False
@@ -977,9 +1130,10 @@ class MN1MusicPlayer:
                 if not isinstance(self.song_length, (int, float)) or self.song_length <= 0: self.song_length = 0.0
                 mins, secs = divmod(int(self.song_length), 60); self.total_time = f"{mins:02d}:{secs:02d}"
                 if self.total_time_label and self.total_time_label.winfo_exists(): self.total_time_label.configure(text=self.total_time)
-                slider_max = max(1.0, self.song_length); num_steps = max(100, int(slider_max * 10))
+                slider_max = max(1.0, self.song_length); num_steps = max(100, int(slider_max * 10)) # Increased steps for finer control
                 if self.song_slider and self.song_slider.winfo_exists(): self.song_slider.configure(to=slider_max, number_of_steps=num_steps)
-                if self.stopped_position == 0 and not self.playing_state:
+                # Only reset UI time/slider if we are truly at the beginning (stopped_position is 0)
+                if self.stopped_position == 0 and not self.playing_state and not self.paused:
                     if self.song_slider and self.song_slider.winfo_exists(): self.song_slider.set(0)
                     if self.current_time_label and self.current_time_label.winfo_exists(): self.current_time_label.configure(text="00:00")
             else: raise ValueError(f"Mutagen could not read info/length for {song_name}")
@@ -1083,23 +1237,29 @@ class MN1MusicPlayer:
                  x = np.arange(len(data)); y = data * 0.9
                  ax.fill_between(x, 0 - y, 0 + y, color=theme['plot_wave_main'], linewidth=0)
                  ax.set_ylim(-1, 1); ax.set_xlim(0, len(data) - 1 if len(data) > 1 else 1)
-            else:
+            else: # Handle empty/silent audio case visually
                  ax.set_ylim(-1, 1); ax.set_xlim(0, 1)
-                 ax.plot([0, 1], [0, 0], color=theme['plot_wave_main'], linewidth=0.5)
+                 ax.plot([0, 1], [0, 0], color=theme['plot_wave_main'], linewidth=0.5) # Draw flat line
             self.position_indicator_line_wave = None
-            current_display_time = self.song_time
+            # Use the current absolute song time for the indicator position
+            current_display_time = np.clip(self.song_time, 0.0, self.song_length if self.song_length > 0 else self.song_time)
             pos_ratio = np.clip(current_display_time / self.song_length, 0.0, 1.0) if self.song_length > 0 else 0.0
             self.draw_waveform_position_indicator(pos_ratio); fig.canvas.draw_idle()
         except Exception as e: print(f"Error drawing static waveform: {e}"); traceback.print_exc(); self.draw_initial_placeholder(ax, fig, spine_color, "DRAW ERROR")
+
 
     def draw_waveform_position_indicator(self, position_ratio):
         ax = self.ax_wave; fig = self.fig_wave; data = self.waveform_peak_data; line_attr = 'position_indicator_line_wave'
         theme = self.themes[self.current_theme_name]; indicator_col = theme['plot_wave_indicator']
         if not ax or not fig or not fig.canvas: return
         try:
-            num_points = len(data) if data is not None else 0; x_max = (num_points - 1) if num_points > 1 else 1
-            position_ratio = np.clip(position_ratio, 0.0, 1.0); x_pos = position_ratio * x_max
+            num_points = len(data) if data is not None else 0
+            x_max = (num_points - 1) if num_points > 1 else 1
+            position_ratio = np.clip(position_ratio, 0.0, 1.0)
+            x_pos = position_ratio * x_max
+            # Ensure x_pos stays within valid range [0, x_max]
             x_pos = max(0, min(x_pos, x_max))
+
             old_line = getattr(self, line_attr, None)
             if old_line and old_line in ax.lines:
                 try: old_line.remove()
@@ -1112,118 +1272,200 @@ class MN1MusicPlayer:
     def update_oscilloscope(self):
         ax = self.ax_osc; fig = self.fig_osc; theme = self.themes[self.current_theme_name]
         spine_color = theme['plot_spine']; osc_col = theme['plot_osc_main']; bg_col = theme['plot_bg']
+        # Conditions to skip update or clear plot
         if (self.raw_sample_data is None or len(self.raw_sample_data) == 0 or
             self.sample_rate is None or self.sample_rate <= 0 or
-            not self.playing_state or self.paused or self.is_seeking or
+            not self.playing_state or self.paused or self.is_seeking or # Skip if not actively playing sound
             not ax or not fig or not fig.canvas):
+            # Clear plot if stopped/paused/seeking and it currently has data
             if (not self.playing_state or self.paused or self.is_seeking) and ax and fig and fig.canvas and len(ax.lines) > 0:
                 self.draw_initial_placeholder(ax, fig, spine_color, "")
             return
         try:
+            # Use self.song_time for the current absolute position
             current_sample_index = int(self.song_time * self.sample_rate)
             window_samples = int(self.osc_window_seconds * self.sample_rate)
-            if window_samples <= 0: window_samples = max(100, int(0.02 * self.sample_rate))
-            start_index = max(0, current_sample_index); end_index = min(len(self.raw_sample_data), start_index + window_samples)
+            if window_samples <= 0: window_samples = max(100, int(0.02 * self.sample_rate)) # Fallback
+
+            # Calculate slice bounds, ensuring they are valid
+            start_index = max(0, current_sample_index)
+            end_index = min(len(self.raw_sample_data), start_index + window_samples)
+            # Adjust start index if end hit boundary to maintain window size if possible
             start_index = max(0, end_index - window_samples)
+
             sample_slice = self.raw_sample_data[start_index:end_index]
+
             if len(sample_slice) > 0:
                 ax.clear(); self._configure_axes(ax, fig, spine_color, bg_col)
                 ax.set_ylim(-1.1, 1.1); x_osc = np.arange(len(sample_slice))
                 ax.plot(x_osc, sample_slice, color=osc_col, linewidth=0.8)
                 ax.set_xlim(0, len(sample_slice) - 1 if len(sample_slice) > 1 else 1)
                 fig.canvas.draw_idle()
-            elif len(ax.lines) > 0: self.draw_initial_placeholder(ax, fig, spine_color, "")
+            elif len(ax.lines) > 0: # Clear if slice is empty (e.g., seeking past end)
+                self.draw_initial_placeholder(ax, fig, spine_color, "")
         except Exception as e: print(f"Error updating oscilloscope: {e}")
 
+
     def update_song_position(self):
+        """Updates UI elements based on current playback time."""
+        # Skip UI updates if user is interacting or seeking programmatically
         if self.slider_active or self.waveform_dragging or self.is_seeking: return
+
         if self.playing_state and not self.paused:
              try:
                  if pygame.mixer.get_init() and pygame.mixer.music.get_busy():
                      current_pos_ms = pygame.mixer.music.get_pos()
-                     if current_pos_ms != -1:
+                     if current_pos_ms != -1: # -1 indicates error/not playing
+                         # Time elapsed since the last play/unpause/seek command
                          time_since_last_play_sec = current_pos_ms / 1000.0
+                         # Absolute current time = base time + elapsed time
                          current_abs_time = self.stopped_position + time_since_last_play_sec
-                         buffer = 0.1
+
+                         # Add buffer to prevent premature song end detection due to timing inaccuracies
+                         buffer = 0.1 # Allow going slightly past reported length
                          current_abs_time = np.clip(current_abs_time, 0.0, (self.song_length + buffer) if self.song_length > 0 else current_abs_time + 1.0)
-                         self.song_time = current_abs_time
+
+                         self.song_time = current_abs_time # Update internal absolute time
+
+                         # --- UI Update Section ---
+                         # Time used for slider and labels should be capped at song length
                          display_time_for_ui = np.clip(self.song_time, 0.0, self.song_length if self.song_length > 0 else self.song_time)
-                         if self.song_slider and self.song_slider.winfo_exists(): self.song_slider.set(display_time_for_ui)
+
+                         if self.song_slider and self.song_slider.winfo_exists():
+                             self.song_slider.set(display_time_for_ui)
                          if self.current_time_label and self.current_time_label.winfo_exists():
-                             mins, secs = divmod(int(display_time_for_ui), 60); time_elapsed_str = f"{mins:02d}:{secs:02d}"
-                             if self.current_time_label.cget("text") != time_elapsed_str: self.current_time_label.configure(text=time_elapsed_str)
+                             mins, secs = divmod(int(display_time_for_ui), 60)
+                             time_elapsed_str = f"{mins:02d}:{secs:02d}"
+                             # Only update label if text changed to reduce overhead
+                             if self.current_time_label.cget("text") != time_elapsed_str:
+                                 self.current_time_label.configure(text=time_elapsed_str)
+
                          pos_ratio = np.clip(display_time_for_ui / self.song_length, 0.0, 1.0) if self.song_length > 0 else 0
                          self.draw_waveform_position_indicator(pos_ratio)
-                         if self.fig_wave and self.fig_wave.canvas: self.fig_wave.canvas.draw_idle()
-                         self.update_oscilloscope()
-                 else:
-                     if self.root.winfo_exists() and self.playing_state:
-                         if self.song_length > 0 and self.song_time >= self.song_length - 0.05: self.root.after(10, self.check_music_end_on_main_thread)
-                         elif not pygame.mixer.music.get_busy(): self.root.after(10, self.check_music_end_on_main_thread)
+                         if self.fig_wave and self.fig_wave.canvas:
+                              self.fig_wave.canvas.draw_idle() # Update waveform plot
+
+                         self.update_oscilloscope() # Update oscilloscope plot
+                         # --- End UI Update Section ---
+
+                 else: # Mixer not busy, might have ended or encountered an issue
+                     # Check if the internal time is past the song length (allowing for slight inaccuracies)
+                     # Or if the mixer explicitly stopped reporting busy
+                     if self.root.winfo_exists() and self.playing_state: # Check state again
+                        is_past_end = (self.song_length > 0 and self.song_time >= self.song_length - 0.05) # Check against internal time
+                        mixer_really_stopped = pygame.mixer.get_init() and not pygame.mixer.music.get_busy()
+
+                        # Schedule end check if past end OR if mixer stopped unexpectedly
+                        if is_past_end or mixer_really_stopped:
+                            self.root.after(10, self.check_music_end_on_main_thread)
+
+
              except pygame.error as e: print(f"Pygame error in update: {e}"); self.has_error = True; self._update_display_title(); self.stop()
              except Exception as e:
                  if self.root.winfo_exists(): print(f"Error during UI update: {e}")
-                 self.thread_running = False
+                 self.thread_running = False # Stop thread on other errors
+
 
     def start_update_thread(self):
         if not self.thread_running and self.playing_state and not self.paused:
             self.thread_running = True
-            if self.update_thread and self.update_thread.is_alive(): return
+            if self.update_thread and self.update_thread.is_alive(): return # Don't start if already running
             self.update_thread = threading.Thread(target=self.update_time, daemon=True); self.update_thread.start()
-        elif not self.playing_state or self.paused: self.thread_running = False
+        elif not self.playing_state or self.paused: self.thread_running = False # Ensure flag is correct
 
     def update_time(self):
-        update_interval = 0.05
+        """[Background Thread] Periodically schedules UI updates on main thread."""
+        update_interval = 0.05 # Target ~20 FPS for UI updates
         while self.thread_running:
             start_loop_time = time.monotonic()
             try:
-                if self.root.winfo_exists(): self.root.after(0, self.update_song_position)
-                else: self.thread_running = False; break
-            except Exception as e: print(f"Update thread error: {e}"); self.thread_running = False; break
-            time_taken = time.monotonic() - start_loop_time; sleep_time = max(0, update_interval - time_taken)
+                if self.root.winfo_exists():
+                     # Schedule update_song_position to run on the main thread
+                     self.root.after(0, self.update_song_position)
+                else: # Root window closed
+                     self.thread_running = False; break
+            except Exception as e: # Catch errors during scheduling
+                 print(f"Update thread error: {e}"); self.thread_running = False; break
+
+            # Calculate sleep time to maintain interval
+            time_taken = time.monotonic() - start_loop_time
+            sleep_time = max(0, update_interval - time_taken)
             time.sleep(sleep_time)
-            if not self.playing_state or self.paused: self.thread_running = False
+
+            # Re-check state after sleep, it might have changed (e.g., user paused)
+            if not self.playing_state or self.paused:
+                self.thread_running = False
+        # print("Update thread finished.") # Optional debug
+
 
     def check_music_end_on_main_thread(self):
+        """[Main Thread] Confirms song end and triggers next action."""
+        # Double-check state, skip if paused, seeking, or already stopped
         if not self.playing_state or self.paused or self.is_seeking: return
         try:
+            # Check if internal time is effectively at/past the end OR mixer stopped
             is_at_end = (self.song_length > 0 and self.song_time >= self.song_length - 0.05)
             mixer_stopped = pygame.mixer.get_init() and not pygame.mixer.music.get_busy()
+
             if mixer_stopped or is_at_end:
                  print(f"Detected song end: {os.path.basename(self.current_song)} (MixerStopped: {mixer_stopped}, IsAtEnd: {is_at_end})")
                  self.playing_state = False; self.paused = False; self.thread_running = False
+                 # Set final position accurately to song length (or 0 if length is 0)
                  final_pos = self.song_length if self.song_length > 0 else 0
                  self.stopped_position = final_pos; self.song_time = final_pos
+
+                 # Update UI to reflect exact end state
                  if self.song_length > 0:
                      if self.song_slider and self.song_slider.winfo_exists(): self.song_slider.set(self.song_length)
                      if self.current_time_label and self.current_time_label.winfo_exists():
                          mins, secs = divmod(int(self.song_length), 60); self.current_time_label.configure(text=f"{mins:02d}:{secs:02d}")
-                     self.draw_waveform_position_indicator(1.0)
-                 else:
+                     self.draw_waveform_position_indicator(1.0) # Indicator at 100%
+                 else: # Handle zero-length case
                      if self.song_slider and self.song_slider.winfo_exists(): self.song_slider.set(0);
                      if self.current_time_label and self.current_time_label.winfo_exists(): self.current_time_label.configure(text="00:00");
                      self.draw_waveform_position_indicator(0.0)
-                 if self.fig_wave and self.fig_wave.canvas: self.fig_wave.canvas.draw_idle()
+                 if self.fig_wave and self.fig_wave.canvas: self.fig_wave.canvas.draw_idle() # Redraw waveform plot
+
+                 # Update button text to Play '▶'
+                 if self.play_pause_button and self.play_pause_button.winfo_exists():
+                     self.play_pause_button.configure(text="▶")
+
+                 # Clear oscilloscope
                  theme = self.themes[self.current_theme_name]; spine_color = theme['plot_spine']
                  self.draw_initial_placeholder(self.ax_osc, self.fig_osc, spine_color, "")
-                 self._update_display_title()
+
+                 self._update_display_title() # Remove [PLAYING] prefix
+                 # Schedule the next action (loop/next/stop)
                  self.root.after(50, self.handle_song_end_action)
-            elif not pygame.mixer.get_init(): self.stop()
+
+            elif not pygame.mixer.get_init(): # Mixer unexpectedly quit
+                 print("Mixer stopped unexpectedly.")
+                 self.stop() # Ensure consistent state
+
         except pygame.error as e: print(f"Pygame error during end check: {e}"); self.has_error=True; self._update_display_title(); self.stop()
         except Exception as e: print(f"Error during end check: {e}"); traceback.print_exc(); self.has_error=True; self._update_display_title(); self.stop()
 
+
     def handle_song_end_action(self):
+        """[Main Thread] Performs action after song ends (loop/next/shuffle/stop)."""
         theme = self.themes[self.current_theme_name]; spine_color = theme['plot_spine']
-        if self.loop_state == 2:
+        if self.loop_state == 2: # Loop One
+             print("Looping current song.")
              if self.song_slider and self.song_slider.winfo_exists(): self.song_slider.set(0);
              if self.current_time_label and self.current_time_label.winfo_exists(): self.current_time_label.configure(text="00:00");
-             self.play_music()
-        elif self.loop_state == 1: self.next_song(auto_advance=True)
-        elif self.shuffle_state: self.play_random_song(auto_advance=True)
-        else:
-             if self.current_song_index >= len(self.songs_list) - 1:
-                 print("End of tracklist reached."); self.stopped_position = 0.0; self.song_time = 0.0; self.current_song_index = 0
-                 if self.songs_list: self.select_song(self.current_song_index)
+             self.play_music() # play_music resets time and starts playback
+        elif self.loop_state == 1: # Loop All
+             print("Looping all - playing next.")
+             self.next_song(auto_advance=True)
+        elif self.shuffle_state: # Mix
+             print("Mix on - playing random.")
+             self.play_random_song(auto_advance=True)
+        else: # No Loop, No Mix
+             if self.current_song_index >= len(self.songs_list) - 1: # End of playlist
+                 print("End of tracklist reached.")
+                 # Reset state to stopped at beginning
+                 self.stopped_position = 0.0; self.song_time = 0.0; self.current_song_index = 0
+                 if self.songs_list: self.select_song(self.current_song_index) # Highlight first song
                  if self.song_slider and self.song_slider.winfo_exists(): self.song_slider.set(0);
                  if self.current_time_label and self.current_time_label.winfo_exists(): self.current_time_label.configure(text="00:00");
                  self.draw_waveform_position_indicator(0)
@@ -1231,32 +1473,45 @@ class MN1MusicPlayer:
                  self.draw_initial_placeholder(self.ax_osc, self.fig_osc, spine_color,"")
                  last_song_name = os.path.basename(self.current_song) if self.current_song else "TRACKLIST END"
                  self._update_display_title(base_title=last_song_name)
-             else: self.next_song(auto_advance=True)
+                 # Ensure button shows Play
+                 if self.play_pause_button and self.play_pause_button.winfo_exists():
+                     self.play_pause_button.configure(text="▶")
+             else: # Play next song in sequence
+                 print("Playing next song in sequence.")
+                 self.next_song(auto_advance=True)
+
 
     def play_random_song(self, auto_advance=False):
         if not self.songs_list: self.stop(); return
         if not auto_advance: self.stop()
-        else: self.playing_state = False; self.paused = False; self.thread_running = False; self.abort_waveform_generation(); self.stopped_position = 0.0; self.song_time = 0.0
+        else: # Auto-advance just resets state, doesn't call stop()
+            self.playing_state = False; self.paused = False; self.thread_running = False;
+            self.abort_waveform_generation(); self.stopped_position = 0.0; self.song_time = 0.0
+            # Let play_music handle setting button text
+            print("Auto-advancing to random song.")
         if len(self.songs_list) > 1:
              possible_indices = [i for i in range(len(self.songs_list)) if i != self.current_song_index]
-             if not possible_indices: possible_indices = list(range(len(self.songs_list)))
+             if not possible_indices: possible_indices = list(range(len(self.songs_list))) # Avoid empty list if only one song repeated
              self.current_song_index = random.choice(possible_indices)
         elif len(self.songs_list) == 1: self.current_song_index = 0
         else: self.clear_playlist(); return
-        self.play_music()
+        self.play_music() # play_music will start from beginning
 
     def abort_waveform_generation(self):
         if self.waveform_thread and self.waveform_thread.is_alive():
             if not self.waveform_abort_flag.is_set():
+                 print(f"Signalling waveform thread to abort...")
                  self.waveform_abort_flag.set()
                  if self.is_generating_waveform:
                       self.is_generating_waveform = False
-                      if self.current_song and "[GENERATING...]" in self.song_title_var.get(): self._update_display_title()
+                      # Update title if it shows generating
+                      if self.current_song and "[GENERATING...]" in self.song_title_var.get():
+                          self._update_display_title()
 
     def on_closing(self):
         print("Closing application..."); self.thread_running = False; self.abort_waveform_generation()
         try:
-            if pygame.mixer.get_init(): pygame.mixer.music.stop(); pygame.mixer.quit()
+            if pygame.mixer.get_init(): pygame.mixer.music.stop(); pygame.mixer.quit(); print("Pygame stopped.")
         except Exception as e: print(f"Error quitting pygame: {e}")
         try: plt.close(self.fig_wave)
         except Exception: pass
