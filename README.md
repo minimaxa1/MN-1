@@ -1,18 +1,16 @@
-MN-1: Engineered for Listening, Built-in Python.
-
+# MN-1: Engineered for Listening, Built in Python
 
 ![Dark Theme ](https://github.com/user-attachments/assets/77bcd1d6-5090-4e3e-9aae-e1541daa17a9)
 
 
-Channelling the spirit of Braun and retro HiFi gear from the past, the MN-1 is a minimal Python MP3, Wav, Flac music player for the discerning ear.
+Channelling the spirit of Braun and retro HiFi gear from the past, the **MN-1** is a minimal Python music player supporting **MP3, WAV, and FLAC** formats, designed for the discerning ear.
 
-Experience music uncluttered, with a clean interface and integrated waveform display focusing on the listening experience, free from distractions, just beautiful sound.
+Experience music uncluttered. The clean interface and integrated **waveform & oscilloscope displays** focus purely on the listening experience, free from distractions – just beautiful sound.
 
-The MN-1 strips away the unnecessary complexities of modern music players, offering a streamlined experience centered around what truly matters: your music.  	
+The MN-1 strips away the unnecessary complexities of modern music players, offering a streamlined experience centered around what truly matters: **your music**.
 
-
-Pro tip: Change your theme and accent colours to get a fresh aesthetic look:
-
+> **Pro tip:** Change your theme and accent colours via the `MN-1` button for a fresh aesthetic look!
+> 
 
 ![Light Theme ](https://github.com/user-attachments/assets/c7271f49-2c7f-47dc-9bc6-1b997efe5e7e)
 
