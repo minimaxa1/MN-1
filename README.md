@@ -37,7 +37,7 @@ Ready to experience minimalist music? Here's how to get the MN-1 running:
 1.  **Clone the Repository:**
     ```bash
     git clone [repository-url] # Replace [repository-url] with the actual GitHub repository URL
-    cd mn-1 # Navigate into the cloned directory
+    cd MN-1 # Navigate into the cloned directory
     ```
 
 2.  **Install Dependencies:**
@@ -54,7 +54,7 @@ Ready to experience minimalist music? Here's how to get the MN-1 running:
 
 1.  **Run the Player:**
     ```bash
-    python MN-9.py
+    python MN-1.pyw
     ```
     *(On Windows, you can also use the provided `.exe` file found in the Bonus link below).*
 
