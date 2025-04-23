@@ -4,6 +4,10 @@ import pygame
 import os
 from mutagen.mp3 import MP3
 from mutagen.flac import FLAC as FLAC_MUTAGEN
+# --- Added for OGG/WAV metadata ---
+from mutagen.oggvorbis import OggVorbis
+from mutagen.wave import WAVE
+# --- End Add ---
 import time
 import random
 import threading
@@ -525,15 +529,29 @@ class MN1MusicPlayer:
         if self.song_title_label and self.song_title_label.winfo_exists(): self.song_title_var.set(f"{prefix}{title}")
 
     def add_songs(self):
-        songs = filedialog.askopenfilenames(title="Select Audio Files", filetypes=(("Audio Files", "*.mp3 *.flac"), ("MP3 Files", "*.mp3"), ("FLAC Files", "*.flac"), ("All Files", "*.*")))
+        # --- Modified filetypes to include OGG and WAV ---
+        songs = filedialog.askopenfilenames(
+            title="Select Audio Files",
+            filetypes=(("Audio Files", "*.mp3 *.flac *.ogg *.wav"),
+                       ("MP3 Files", "*.mp3"),
+                       ("FLAC Files", "*.flac"),
+                       ("Ogg Files", "*.ogg"),
+                       ("WAV Files", "*.wav"),
+                       ("All Files", "*.*"))
+        )
+        # --- End Modification ---
         added_count = 0
         if not songs: return
         for song_path in songs:
             if os.path.exists(song_path):
                  try:
                     file_ext = os.path.splitext(song_path)[1].lower()
+                    # --- Modified validation to include OGG and WAV ---
                     if file_ext == ".mp3": MP3(song_path)
                     elif file_ext == ".flac": FLAC_MUTAGEN(song_path)
+                    elif file_ext == ".ogg": OggVorbis(song_path)
+                    elif file_ext == ".wav": WAVE(song_path)
+                    # --- End Modification ---
                     else: print(f"Skipping unsupported file type: {os.path.basename(song_path)}"); continue
                     song_name = os.path.basename(song_path)
                     if song_path not in self.songs_list: self.add_song_to_playlist(song_name, song_path); self.songs_list.append(song_path); added_count += 1
@@ -995,8 +1013,12 @@ class MN1MusicPlayer:
         try:
             file_extension = os.path.splitext(self.current_song)[1].lower()
             audio = None
+            # --- Modified file type check for metadata ---
             if file_extension == '.mp3': audio = MP3(self.current_song)
             elif file_extension == '.flac': audio = FLAC_MUTAGEN(self.current_song)
+            elif file_extension == '.ogg': audio = OggVorbis(self.current_song)
+            elif file_extension == '.wav': audio = WAVE(self.current_song)
+            # --- End Modification ---
             else: raise ValueError(f"Unsupported file type for info: {file_extension}")
 
             if audio and hasattr(audio, 'info') and hasattr(audio.info, 'length'):
@@ -1038,6 +1060,7 @@ class MN1MusicPlayer:
             if not os.path.exists(song_path): raise FileNotFoundError(f"Audio file not found: {song_path}")
 
             try:
+                # soundfile supports MP3, FLAC, OGG, WAV etc. through libsndfile
                 audio_data, original_sample_rate = sf.read(song_path, dtype='float64', always_2d=True)
                 if abort_flag.is_set(): return
                 if audio_data.size == 0: raise ValueError("Audio file contains no samples.")
